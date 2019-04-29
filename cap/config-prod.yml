@@ -1,3 +1,4 @@
+uploadPath: prod
 db:
   jdbc:
     url: jdbc:prod:2345
