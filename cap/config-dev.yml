@@ -1,3 +1,4 @@
+uploadPath=dev
 db:
   jdbc:
     url: jdbc:dev:1234
