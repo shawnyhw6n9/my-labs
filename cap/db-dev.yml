@@ -1,0 +1,3 @@
+db:
+  jdbc:
+    url: jdbc:dev:1234
