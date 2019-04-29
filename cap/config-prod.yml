@@ -1,4 +1,5 @@
-uploadPath: prod
+upload:
+  path: prod
 db:
   jdbc:
     url: jdbc:prod:2345
