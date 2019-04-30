@@ -1,5 +1,5 @@
 upload:
-  path: changeDevToStage
+  path: hello im dev update
 
 db:
   jdbc:
