@@ -1,5 +1,5 @@
 /* 
- * RestController.java
+ * TestController.java
  * 
  * Copyright (c) 2019 International Integrated System, Inc. 
  * All Rights Reserved.
@@ -9,7 +9,7 @@
  * This software is confidential and proprietary information of 
  * International Integrated System, Inc. (&quot;Confidential Information&quot;).
  */
-package com.iisigroup.cap.client;
+package com.iisigroup.cap.app.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -18,19 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <pre>
- * A Hello Controller.
+ * Sample Controller.
  * </pre>
  * 
- * @since Apr 29, 2019
+ * @since May 2, 2019
  * @author Sunkist Wang
  * @version
  *          <ul>
- *          <li>Apr 29, 2019,Sunkist Wang,new
+ *          <li>May 2, 2019,Sunkist Wang,new
  *          </ul>
  */
 @RestController
 @RefreshScope
-class TestController {
+public class SampleController {
 
     @Value("${upload.path:}")
     private String uploadPath;
@@ -38,8 +38,8 @@ class TestController {
     @Value("${db.jdbc.url:}")
     private String dbJdbcUrl;
 
-    @RequestMapping("/test")
-    public String from() {
-        return "uploadPath= "+ this.uploadPath+ ",dbJdbcUrl= "+ this.dbJdbcUrl;
+    @RequestMapping("/configs")
+    public String showConfig() {
+        return "uploadPath= " + this.uploadPath + ",dbJdbcUrl= " + this.dbJdbcUrl;
     }
 }

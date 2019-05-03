@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      name: config
+      profile: dev 
+      uri: http://localhost:8001/config-server,http://localhost:8003/config-server
+      label: master
