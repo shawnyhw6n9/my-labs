@@ -4,3 +4,9 @@
 `java -jar -Dserver.port=8001 target/cap-cloudconfig-5.0.0.jar`
 3. Start backup config server.  
 `java -jar -Dserver.port=8003 target/cap-cloudconfig-5.0.0.jar`
+4. The HTTP service has resources in the following form:
+`/{application}/{profile}[/{label}]
+/{application}-{profile}.yml
+/{label}/{application}-{profile}.yml
+/{application}-{profile}.properties
+/{label}/{application}-{profile}.properties`
