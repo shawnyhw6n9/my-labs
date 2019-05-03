@@ -18,13 +18,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8001/config/dev/master",
+							"raw": "http://localhost:8001/config-server/config/dev/master",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8001",
 							"path": [
+								"config-server",
 								"config",
 								"dev",
 								"master"
@@ -34,7 +35,7 @@
 					"response": []
 				},
 				{
-					"name": "2. config client (controller=test)",
+					"name": "2. config client (controller=configs)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -43,14 +44,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8002/test",
+							"raw": "http://localhost:8080/configs",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8002",
+							"port": "8080",
 							"path": [
-								"test"
+								"configs"
 							]
 						}
 					},
@@ -66,12 +67,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8002/actuator/refresh",
+							"raw": "http://localhost:8080/actuator/refresh",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8002",
+							"port": "8080",
 							"path": [
 								"actuator",
 								"refresh"
@@ -90,12 +91,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8002/actuator/health",
+							"raw": "http://localhost:8080/actuator/health",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8002",
+							"port": "8080",
 							"path": [
 								"actuator",
 								"health"
@@ -114,12 +115,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8002/actuator/info",
+							"raw": "http://localhost:8080/actuator/info",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8002",
+							"port": "8080",
 							"path": [
 								"actuator",
 								"info"
@@ -129,7 +130,7 @@
 					"response": []
 				},
 				{
-					"name": "4. http://eureka-demo-rce.apps.example.com",
+					"name": "4. http://localhost:8001 (eureka)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -138,14 +139,32 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://eureka-demo-rce.apps.example.com",
+							"raw": "http://localhost:8001",
 							"protocol": "http",
 							"host": [
-								"eureka-demo-rce",
-								"apps",
-								"example",
-								"com"
-							]
+								"localhost"
+							],
+							"port": "8001"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.1 http://localhost:8003 (eureka)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8003",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8003"
 						}
 					},
 					"response": []
@@ -160,13 +179,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8003/config/dev/master",
+							"raw": "http://localhost:8003/config-server/config/dev/master",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8003",
 							"path": [
+								"config-server",
 								"config",
 								"dev",
 								"master"

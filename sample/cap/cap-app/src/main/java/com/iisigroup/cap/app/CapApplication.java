@@ -1,25 +1,27 @@
-package com.iisigroup.cap.client;
+package com.iisigroup.cap.app;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * <pre>
- * Test config client
+ * Spring Boot Application.
  * </pre>
  * 
- * @since Apr 29, 2019
+ * @since May 2, 2019
  * @author Sunkist Wang
  * @version
  *          <ul>
- *          <li>Apr 29, 2019,Sunkist Wang,new
+ *          <li>May 2, 2019,Sunkist Wang,new
  *          </ul>
  */
 @EnableDiscoveryClient
 @SpringBootApplication
-public class ConfigClientApplication {
+public class CapApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(ConfigClientApplication.class, args);
+        SpringApplication.run(CapApplication.class, args);
     }
 
 }
