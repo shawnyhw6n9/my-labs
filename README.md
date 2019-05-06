@@ -1,6 +1,6 @@
-# my-labs
-1. Config Management  
-1.1 config-repo  
+### Spring Boot Application Practice
+1. [Config Management](https://github.com/shawnyhw6n9/my-labs/tree/config_management)  
+1.1 [config-repo](https://github.com/shawnyhw6n9/my-labs/tree/master/config-repo)  
 1.2 Webhook  
 1.3 Eureka  
 2. Data  
