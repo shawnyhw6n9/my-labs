@@ -3,10 +3,10 @@ spring:
     config:
       name: config
       profile: dev 
-      uri: http://cloudconfig-server-1:8001/config-server,http://cloudconfig-server-2:8001/config-server
+      uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
       label: master
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://cloudconfig-server-1:8001/eureka,http://cloudconfig-server-2:8001/eureka
+      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka

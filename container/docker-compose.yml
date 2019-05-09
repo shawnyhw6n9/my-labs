@@ -7,13 +7,17 @@ services:
       args:
         JAR_FILE: ./dist/5.0.0/cap-cloudconfig-5.0.0.jar
     ports:
-     - "8001:8001"
+      - "8001:8001"
+    environment:
+      - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
   cloudconfig-2:
     image: container_cloudconfig-1:latest
     ports:
-     - "8001"
+      - "8001"
     depends_on:
       - cloudconfig-1
+    environment:
+      - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
   app:
     build:
       context: ..
@@ -21,10 +25,15 @@ services:
       args:
         JAR_FILE: ./dist/5.0.0/cap-app-5.0.0.jar
     ports:
-     - "8080:8080"
+      - "8080:8080"
+    depends_on:
+      - cloudconfig-1
+      - cloudconfig-2
     links:
       - "cloudconfig-1:cloudconfig-server-1"
       - "cloudconfig-2:cloudconfig-server-2"
+    environment:
+      - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
     deploy:
       replicas: 1
       update_config:
