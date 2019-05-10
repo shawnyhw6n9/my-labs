@@ -6,12 +6,13 @@ services:
       dockerfile: container/Dockerfile
       args:
         JAR_FILE: ./dist/5.0.0/cap-cloudconfig-5.0.0.jar
+    image: shawnyhw6n9/cap-cloudconfig:5.0.0-dev
     ports:
       - "8001:8001"
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
   cloudconfig-2:
-    image: container_cloudconfig-1:latest
+    image: shawnyhw6n9/cap-cloudconfig:5.0.0-dev
     ports:
       - "8001"
     depends_on:
@@ -24,6 +25,7 @@ services:
       dockerfile: container/Dockerfile
       args:
         JAR_FILE: ./dist/5.0.0/cap-app-5.0.0.jar
+    image: shawnyhw6n9/cap-app:5.0.0-dev
     ports:
       - "8080:8080"
     depends_on:
