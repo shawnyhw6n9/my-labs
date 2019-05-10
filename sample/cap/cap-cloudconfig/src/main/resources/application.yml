@@ -22,7 +22,7 @@ eureka:
     fetchRegistry: false
     serviceUrl:
 #      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
-      defaultZone: http://localhost:8001/eureka,http://localhost:8003/eureka
+      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
 
 logging.level.com.netflix:
   eureka: DEBUG
