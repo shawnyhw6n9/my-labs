@@ -3,15 +3,25 @@ server:
 
 spring:
   application:
-    name: spring-cloud-config-server
+    name: CAP-CLOUD-CONFIG-SERVER
   cloud:
     config:
       server:
+        prefix: /config-server
         git:
           uri: https://github.com/shawnyhw6n9/my-labs
           search-paths: config-repo/cap
 
 eureka:
+  instance:
+    hostname: localhost
   client:
+    registerWithEureka: false
+    fetchRegistry: false
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+#      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
+
+logging.level.com.netflix:
+  eureka: DEBUG
+  discovery: DEBUG
