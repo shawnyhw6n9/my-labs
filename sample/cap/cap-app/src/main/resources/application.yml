@@ -2,8 +2,6 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: CAP
   cloud:
     config:
       discovery:
@@ -22,7 +20,7 @@ management:
       exposure:
         include: refresh,health,info
 
-#eureka:
+# eureka:
 #  client:
 #    serviceUrl:
 #      defaultZone: http://localhost:8001/eureka,http://localhost:8003/eureka
