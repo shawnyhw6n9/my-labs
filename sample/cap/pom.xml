@@ -23,6 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <springfox-swagger.version>3.0.0-SNAPSHOT</springfox-swagger.version>
+        <spirng-boot-admin.version>2.1.5</spirng-boot-admin.version>
     </properties>
     <repositories>
         <repository>
@@ -70,6 +71,7 @@
     <modules>
         <module>cap-cloudconfig</module>
         <module>cap-app</module>
+        <module>cap-adminserver</module>
     </modules>
     <profiles>
         <profile>
