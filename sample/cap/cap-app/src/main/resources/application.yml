@@ -31,3 +31,6 @@ logging:
       netflix:
         eureka: DEBUG
         discovery: DEBUG
+
+swaggerConfig:
+  apiVersion: 5.0.0

@@ -18,13 +18,21 @@
         <hibernate.validator.version>5.2.4.Final</hibernate.validator.version>
         <bean.validation.version>1.1.0.Final</bean.validation.version>
         <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <springfox-swagger.version>3.0.0-SNAPSHOT</springfox-swagger.version>
     </properties>
     <repositories>
         <repository>
             <id>localRepository</id>
             <url>file://${project.basedir}/../${localRepositoryPath}</url>
+        </repository>
+        <repository>
+            <id>jcenter-snapshots</id>
+            <name>jcenter</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
         </repository>
     </repositories>
     <dependencyManagement>
@@ -238,7 +246,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
