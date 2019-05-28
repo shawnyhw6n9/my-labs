@@ -13,6 +13,11 @@ spring:
 #          timeout: 4
           uri: file:///${user.home}/Documents/study/study_microservices_poc/my-labs
           search-paths: config-repo/cap
+  boot.admin.client:
+    url: http://localhost:8088
+    #url: http://spring-boot-admin:8088
+
+management.endpoints.web.exposure.include: "*"
 
 eureka:
   instance:

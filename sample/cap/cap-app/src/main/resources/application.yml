@@ -16,11 +16,13 @@ info:
     name: com.iisigroup.cap.app.CAP
     description: Cap by Spring Boot Application
     version: 5.0.0
-management:
-  endpoints:
-    web:
-      exposure:
-        include: refresh,health,info
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: refresh,health,info,monitor/hystrix.stream
+management.endpoints.web.exposure.include: "*"
 
 #eureka:
 #  client:
