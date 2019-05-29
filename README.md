@@ -6,6 +6,8 @@
 2. Data  
 2.1 [Spring Data JPA](https://github.com/shawnyhw6n9/my-labs/tree/data_jpa)  
 2.2 Use JNDI  
+2.3 [Session(Share) Data Management](https://github.com/shawnyhw6n9/my-labs/tree/session_management)  
+2.4 [Job Schedule](https://github.com/shawnyhw6n9/my-labs/tree/job_schedule)   
 3. View  
 3.1 [Spring Web MVC](https://github.com/shawnyhw6n9/my-labs/tree/view_springwebmvc)  
 3.2 Thymeleaf  

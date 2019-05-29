@@ -38,5 +38,5 @@ logging:
         eureka: DEBUG
         discovery: DEBUG
 
-swaggerConfig:
-  apiVersion: 5.0.0
+#swaggerConfig:
+  #apiVersion: 5.0.0

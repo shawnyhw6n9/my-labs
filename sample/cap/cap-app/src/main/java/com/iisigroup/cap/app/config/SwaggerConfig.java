@@ -39,7 +39,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 @EnableSwagger2WebMvc
 public class SwaggerConfig {
 
-    @Value("${swaggerConfig.apiVersion: x.x.x}")
+    @Value("${info.app.version: x.x.x}")
     private String apiVersion;
 
     @Bean
