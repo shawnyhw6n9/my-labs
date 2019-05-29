@@ -7,6 +7,10 @@ spring:
       discovery:
         enabled: true
         service-id: CAP-CLOUD-CONFIG-SERVER
+  sleuth:
+    sampler:
+      percentage: 0.1
+      #percentage: 1.0
 
 # spring boot actuator
 info:

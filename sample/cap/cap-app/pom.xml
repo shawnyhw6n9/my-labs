@@ -76,6 +76,10 @@
             <artifactId>spring-boot-admin-starter-client</artifactId>
             <version>${spirng-boot-admin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
