@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <zipkin.version>2.11.7</zipkin.version>
     </properties>
     <repositories>
         <repository>
@@ -62,6 +63,7 @@
     <modules>
         <module>cap-cloudconfig</module>
         <module>cap-app</module>
+        <module>cap-tracing</module>
     </modules>
     <profiles>
         <profile>

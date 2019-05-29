@@ -1,0 +1,7 @@
+server:
+  port: 9411
+spring:
+  application:
+    name: ZIPKIN-SERVER
+  main:
+    allow-bean-definition-overriding: true
