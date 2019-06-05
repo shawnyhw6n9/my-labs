@@ -10,6 +10,12 @@
     <artifactId>cap-app</artifactId>
     <name>cap-app</name>
     <description>Cap by Spring Boot Application</description>
+    <properties>
+        <start-class>com.iisigroup.cap.app.CapApplication</start-class>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
+    <packaging>jar</packaging>
+<!--     <packaging>war</packaging> -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,6 +85,21 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+        <!-- ap server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
         </dependency>
     </dependencies>
     <build>

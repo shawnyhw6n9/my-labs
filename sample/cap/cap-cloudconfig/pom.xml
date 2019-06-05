@@ -10,6 +10,12 @@
     <artifactId>cap-cloudconfig</artifactId>
     <name>cap-cloudconfig</name>
     <description>Cloud config project for Spring Boot</description>
+    <properties>
+        <start-class>com.iisigroup.cap.config.CapCloudConfigServerApplication</start-class>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
+    <packaging>jar</packaging>
+<!--     <packaging>war</packaging> -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -45,6 +51,21 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+        <!-- ap server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
         </dependency>
     </dependencies>
     <build>
