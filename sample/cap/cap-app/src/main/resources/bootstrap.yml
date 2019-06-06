@@ -2,9 +2,13 @@ spring:
   cloud:
     config:
       name: config
-      profile: dev 
+      profile: dev
       uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
       label: master
+  redis:
+    cluster:
+      nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
+    timeout: 500
 
 eureka:
   client:
