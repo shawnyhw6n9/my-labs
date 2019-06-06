@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.Bean;
+
+import com.iisigroup.cap.utils.CapAppContext;
 
 /**
  * <pre>
@@ -31,4 +34,8 @@ public class CapApplication extends SpringBootServletInitializer {
         SpringApplication.run(CapApplication.class, args);
     }
 
+    @Bean
+    public CapAppContext capAppContext() {
+        return new CapAppContext();
+    }
 }
