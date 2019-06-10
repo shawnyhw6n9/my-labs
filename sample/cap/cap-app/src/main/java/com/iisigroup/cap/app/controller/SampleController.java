@@ -11,10 +11,16 @@
  */
 package com.iisigroup.cap.app.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.iisigroup.cap.app.model.Customer;
+import com.iisigroup.cap.app.repositories.CustomerRepository;
 
 /**
  * <pre>
@@ -38,8 +44,27 @@ public class SampleController {
     @Value("${db.jdbc.url:}")
     private String dbJdbcUrl;
 
+    @Autowired
+    CustomerRepository customerRespository;
+
     @RequestMapping("/configs")
     public String showConfig() {
         return "uploadPath= " + this.uploadPath + ",dbJdbcUrl= " + this.dbJdbcUrl;
     }
+
+    @RequestMapping("/customers")
+    public String getCustomers() {
+
+        customerRespository.save(new Customer("Sunkist", "Wang"));
+        customerRespository.findAll();
+
+        List<Customer> customers = customerRespository.findByLastName("Wang");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Customer customer : customers) {
+            stringBuilder.append(customer.toString());
+        }
+        return stringBuilder.toString();
+    }
+
 }
