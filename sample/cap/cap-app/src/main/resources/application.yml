@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   cloud:
     config:
       discovery:
@@ -17,6 +19,16 @@ spring:
         max-wait: 5000
         max-Idle: 50
         min-Idle: 5
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
 
 # spring boot actuator
 info:
@@ -43,6 +55,8 @@ logging:
       netflix:
         eureka: DEBUG
         discovery: DEBUG
+    org:
+      hibernate.type: WARN
 
 #swaggerConfig:
   #apiVersion: 5.0.0

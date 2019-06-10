@@ -11,10 +11,13 @@
  */
 package com.iisigroup.cap.app.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.iisigroup.cap.app.service.CustomerManagement;
 
 /**
  * <pre>
@@ -38,8 +41,17 @@ public class SampleController {
     @Value("${db.jdbc.url:}")
     private String dbJdbcUrl;
 
+    @Autowired
+    CustomerManagement customerManagement;
+
     @RequestMapping("/configs")
     public String showConfig() {
         return "uploadPath= " + this.uploadPath + ",dbJdbcUrl= " + this.dbJdbcUrl;
     }
+
+    @RequestMapping("/customers")
+    public String getCustomers() {
+        return customerManagement.updateCustomerInfos("Wang");
+    }
+
 }
