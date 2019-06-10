@@ -11,16 +11,13 @@
  */
 package com.iisigroup.cap.app.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iisigroup.cap.app.model.Customer;
-import com.iisigroup.cap.app.repositories.CustomerRepository;
+import com.iisigroup.cap.app.service.CustomerManagement;
 
 /**
  * <pre>
@@ -45,7 +42,7 @@ public class SampleController {
     private String dbJdbcUrl;
 
     @Autowired
-    CustomerRepository customerRespository;
+    CustomerManagement customerManagement;
 
     @RequestMapping("/configs")
     public String showConfig() {
@@ -54,17 +51,7 @@ public class SampleController {
 
     @RequestMapping("/customers")
     public String getCustomers() {
-
-        customerRespository.save(new Customer("Sunkist", "Wang"));
-        customerRespository.findAll();
-
-        List<Customer> customers = customerRespository.findByLastName("Wang");
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Customer customer : customers) {
-            stringBuilder.append(customer.toString());
-        }
-        return stringBuilder.toString();
+        return customerManagement.updateCustomerInfos("Wang");
     }
 
 }

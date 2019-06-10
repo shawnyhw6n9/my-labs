@@ -11,6 +11,16 @@ spring:
       discovery:
         enabled: true
         service-id: CAP-CLOUD-CONFIG-SERVER
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
 
 # spring boot actuator
 info:
@@ -35,3 +45,5 @@ logging:
       netflix:
         eureka: DEBUG
         discovery: DEBUG
+    org:
+      hibernate.type: WARN

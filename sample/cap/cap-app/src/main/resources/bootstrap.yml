@@ -5,6 +5,10 @@ spring:
       profile: dev 
       uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
       label: master
+  datasource:
+    username: sa
+    password: p@ssw0rd
+    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
 
 eureka:
   client:
