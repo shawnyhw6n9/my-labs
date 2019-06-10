@@ -13,7 +13,8 @@ package com.iisigroup.cap.app.repositories;
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.iisigroup.cap.app.model.Customer;
 
@@ -29,6 +30,10 @@ import com.iisigroup.cap.app.model.Customer;
  *          <li>Jun 10, 2019,Sunkist Wang,new
  *          </ul>
  */
-public interface CustomerRepository extends CrudRepository<Customer, Long> {
+// @Transactional(readOnly = true)
+public interface CustomerRepository extends JpaRepository<Customer, String> {
+    // @Modifying
+    // @Transactional(timeout = 10)
+    @Query("select c from Customer c where c.lastName = ?1")
     List<Customer> findByLastName(String lastName);
 }
