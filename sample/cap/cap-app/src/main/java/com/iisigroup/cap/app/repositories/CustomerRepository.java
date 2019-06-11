@@ -13,7 +13,6 @@ package com.iisigroup.cap.app.repositories;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.iisigroup.cap.app.model.Customer;
@@ -31,7 +30,7 @@ import com.iisigroup.cap.app.model.Customer;
  *          </ul>
  */
 // @Transactional(readOnly = true)
-public interface CustomerRepository extends JpaRepository<Customer, String> {
+public interface CustomerRepository extends CapBaseRepository<Customer, String> {
     // @Modifying
     // @Transactional(timeout = 10)
     @Query("select c from Customer c where c.lastName = ?1")

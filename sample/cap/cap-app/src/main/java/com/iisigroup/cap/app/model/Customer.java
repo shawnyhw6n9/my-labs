@@ -15,6 +15,9 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * <pre>
@@ -29,12 +32,19 @@ import javax.persistence.Id;
  *          </ul>
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "id" }))
 public class Customer {
 
     @Id
     private String id;
     private String firstName;
     private String lastName;
+
+    @PrePersist
+    public void perPersist() {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        this.setId(uuid);
+    }
 
     protected Customer() {
     }
@@ -48,7 +58,6 @@ public class Customer {
      *            String
      */
     public Customer(String firstName, String lastName) {
-        this.id = UUID.randomUUID().toString().replace("-", "");
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -71,6 +80,10 @@ public class Customer {
 
     public String getId() {
         return id;
+    }
+
+    private void setId(String id) {
+        this.id = id;
     }
 
     @Override
