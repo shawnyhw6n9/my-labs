@@ -36,7 +36,7 @@ info:
   app:
     name: com.iisigroup.cap.app.CAP
     description: Cap by Spring Boot Application
-    version: 5.0.0
+    version: 5.0.1
 
 #management:
 #  endpoints:
@@ -60,4 +60,4 @@ logging:
       hibernate.type: WARN
 
 #swaggerConfig:
-  #apiVersion: 5.0.0
+  #apiVersion: ${project.version}

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>cap</artifactId>
         <groupId>com.iisigroup.cap</groupId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
     </parent>
     <artifactId>cap-cloudconfig</artifactId>
     <name>cap-cloudconfig</name>
