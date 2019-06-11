@@ -9,9 +9,8 @@ spring:
       server:
         prefix: /config-server
         git:
-#          uri: https://github.com/shawnyhw6n9/my-labs/
-#          timeout: 4
-          uri: file:///${user.home}/Documents/study/study_microservices_poc/my-labs
+          uri: https://github.com/shawnyhw6n9/my-labs/
+          timeout: 4
           search-paths: config-repo/cap
   boot.admin.client:
     url: http://localhost:8088
@@ -33,8 +32,8 @@ eureka:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-#      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
-      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+#      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
 
 logging.level.com.netflix:
   eureka: DEBUG

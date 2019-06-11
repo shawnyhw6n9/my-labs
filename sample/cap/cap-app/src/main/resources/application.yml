@@ -19,8 +19,8 @@ spring:
         max-wait: 5000
         max-Idle: 50
         min-Idle: 5
-  datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#  datasource:
+#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     show-sql: true
     hibernate:
@@ -28,7 +28,8 @@ spring:
       naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.SQLServerDialect
+        dialect: org.hibernate.dialect.H2Dialect
+#        dialect: org.hibernate.dialect.SQLServerDialect
 
 # spring boot actuator
 info:

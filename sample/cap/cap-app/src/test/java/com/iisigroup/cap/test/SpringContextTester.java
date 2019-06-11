@@ -14,12 +14,14 @@ package com.iisigroup.cap.test;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.iisigroup.cap.app.CapApplication;
 import com.iisigroup.cap.app.controller.SampleController;
-import com.iisigroup.cap.utils.CapAppContext;
 
 /**
  * <pre>
@@ -35,11 +37,19 @@ import com.iisigroup.cap.utils.CapAppContext;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = CapApplication.class)
-public class SpringContextTester {
+public class SpringContextTester implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Test
     public void test() {
-        SampleController controller = CapAppContext.getBean("SampleController");
+        String beanName = "SampleController";
+        SampleController controller = applicationContext.containsBean(beanName) ? (SampleController) applicationContext.getBean(beanName) : null;
         Assert.assertNull("Assert controller is not null", controller);
     }
 

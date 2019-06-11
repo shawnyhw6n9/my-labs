@@ -5,7 +5,8 @@ spring:
     config:
       name: config
       profile: dev
-      uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
+      uri: http://localhost:8001/config-server
+#      uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
       label: master
   boot.admin.client:
     url: http://localhost:8088
@@ -17,12 +18,13 @@ spring:
     cluster:
       nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
     timeout: 500
-  datasource:
-    username: sa
-    password: p@ssw0rd
-    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
+#  datasource:
+#    username: sa
+#    password: p@ssw0rd
+#    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
+      defaultZone: http://localhost:8001/eureka
+#      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka

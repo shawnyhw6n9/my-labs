@@ -15,7 +15,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
     <packaging>jar</packaging>
-<!--     <packaging>war</packaging> -->
+    <!-- <packaging>war</packaging> -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,10 +102,6 @@
             <artifactId>jstl</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.iisigroup.cap</groupId>
-            <artifactId>cap-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
@@ -114,9 +110,8 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>sqljdbc</artifactId>
-            <version>4.0</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
