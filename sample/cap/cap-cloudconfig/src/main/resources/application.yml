@@ -24,13 +24,17 @@ spring:
       percentage: 0.1
       #percentage: 1.0
 
-management.endpoints.web.exposure.include: "*"
+management:
+  endpoints:
+    web.exposure.include: "*"
+    health.sensitive: false
+  endpoint.health.show-details: ALWAYS
 
 eureka:
   instance:
     hostname: localhost
   client:
-    registerWithEureka: false
+    registerWithEureka: true
     fetchRegistry: false
     serviceUrl:
 #      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka

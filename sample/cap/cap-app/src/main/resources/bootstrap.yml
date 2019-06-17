@@ -17,10 +17,10 @@ spring:
     cluster:
       nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
     timeout: 500
-  datasource:
-    username: sa
-    password: p@ssw0rd
-    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
+#  datasource:
+#    username: sa
+#    password: p@ssw0rd
+#    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
 
 eureka:
   client:
