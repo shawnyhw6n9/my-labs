@@ -14,11 +14,178 @@ services:
   cloudconfig-2:
     image: shawnyhw6n9/cap-cloudconfig:${TAG}-dev
     ports:
-      - "8001:8001"
+      - "8002:8002"
     depends_on:
       - cloudconfig-1
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+  adminserver-1:
+    build:
+      context: ..
+      dockerfile: container/Dockerfile
+      args:
+        JAR_FILE: ./dist/${TAG}/cap-adminserver-${TAG}.jar
+    image: shawnyhw6n9/cap-adminserver:${TAG}-dev
+    ports:
+      - "8088:8088"
+    environment:
+      - PREFIX_ADMIN_SERVER=admin-server
+  tracing-1:
+    build:
+      context: ..
+      dockerfile: container/Dockerfile
+      args:
+        JAR_FILE: ./dist/${TAG}/cap-tracing-${TAG}.jar
+    image: shawnyhw6n9/cap-tracing:${TAG}-dev
+    ports:
+      - "9411:9411"
+    environment:
+      - PREFIX_TRACING=tracing
+  redis-1:
+    container_name: redis-1
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    ports:
+      - "7000:6379"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.2
+  redis-2:
+    container_name: redis-2
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    command: redis-server --slaveof redis-1 6379
+    ports:
+      - "7001:6379"
+    links:
+      - "redis-1:redis-1"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.3
+  redis-3:
+    container_name: redis-3
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    ports:
+      - "7100:6379"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.4
+  redis-4:
+    container_name: redis-4
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    command: redis-server --slaveof redis-3 6379
+    ports:
+      - "7101:6379"
+    links:
+      - "redis-3:redis-3"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.5
+  redis-5:
+    container_name: redis-5
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    ports:
+      - "7200:6379"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.6
+  redis-6:
+    container_name: redis-6
+    build:
+      context: ..
+      dockerfile: container/redisnode/Dockerfile
+    image: shawnyhw6n9/cap-redisnode:${TAG}-dev
+    command: redis-server --slaveof redis-5 6379
+    ports:
+      - "7201:6379"
+    links:
+      - "redis-5:redis-5"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.7
+  redis-cluster-creator:
+    build:
+      context: ..
+      dockerfile: container/createnode/Dockerfile
+    image: shawnyhw6n9/cap-redisclustercreator:${TAG}-dev
+    links:
+      - "redis-1:redis-1"
+      - "redis-2:redis-2"
+      - "redis-3:redis-3"
+      - "redis-4:redis-4"
+      - "redis-5:redis-5"
+      - "redis-6:redis-6"
+    environment:
+      - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+  redis-sentinel1:
+    container_name: redis-sentinel1
+    build:
+      context: ..
+      dockerfile: container/sentinel/Dockerfile
+    image: shawnyhw6n9/cap-sentinel:${TAG}-dev
+    networks:
+      extnetwork:
+    links:
+      - redis-1
+      - redis-2
+      - redis-3
+    environment:
+      - PREFIX_REDIS=redis
+  redis-sentinel2:
+    container_name: redis-sentinel2
+    build:
+      context: ..
+      dockerfile: container/sentinel/Dockerfile
+    image: shawnyhw6n9/cap-sentinel:${TAG}-dev
+    networks:
+      extnetwork:
+    links:
+      - redis-1
+      - redis-2
+      - redis-3
+    environment:
+      - PREFIX_REDIS=redis
+  redis-sentinel3:
+    container_name: redis-sentinel3
+    build:
+      context: ..
+      dockerfile: container/sentinel/Dockerfile
+    image: shawnyhw6n9/cap-sentinel:${TAG}-dev
+    networks:
+      extnetwork:
+    links:
+      - redis-1
+      - redis-2
+      - redis-3
+    environment:
+      - PREFIX_REDIS=redis
   app:
     build:
       context: ..
@@ -34,8 +201,19 @@ services:
     links:
       - "cloudconfig-1:cloudconfig-server-1"
       - "cloudconfig-2:cloudconfig-server-2"
+      - "adminserver-1:admin-server-1"
+      - "tracing-1:tracing-1"
+      - "redis-1:redis-1"
+      - "redis-2:redis-2"
+      - "redis-3:redis-3"
+      - "redis-4:redis-4"
+      - "redis-5:redis-5"
+      - "redis-6:redis-6"
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+      - PREFIX_ADMIN_SERVER=admin-server
+      - PREFIX_TRACING=tracing
+      - PREFIX_REDIS=redis
     deploy:
       replicas: 1
       update_config:
@@ -43,3 +221,8 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+networks:
+   extnetwork:
+      ipam:
+         config:
+         - subnet: 172.19.0.0/16

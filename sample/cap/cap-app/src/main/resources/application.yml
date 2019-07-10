@@ -30,7 +30,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
 #        dialect: org.hibernate.dialect.SQLServerDialect
-
 # spring boot actuator
 info:
   app:
@@ -43,7 +42,11 @@ info:
 #    web:
 #      exposure:
 #        include: refresh,health,info,monitor/hystrix.stream
-management.endpoints.web.exposure.include: "*"
+management:
+  endpoints:
+    web.exposure.include: "*"
+    shutdown.enabled: true
+endpoints.shutdown.enabled: true
 
 # eureka:
 #  client:
