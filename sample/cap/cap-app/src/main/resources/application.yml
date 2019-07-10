@@ -13,12 +13,12 @@ spring:
     sampler:
       percentage: 0.1
       #percentage: 1.0
-  redis:
-    jedis:
-      pool:
-        max-wait: 5000
-        max-Idle: 50
-        min-Idle: 5
+#  redis:
+#    jedis:
+#      pool:
+#        max-wait: 5000
+#        max-Idle: 50
+#        min-Idle: 5
 #  datasource:
 #    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
