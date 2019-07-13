@@ -11,14 +11,20 @@ services:
       - "8001:8001"
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.8
   cloudconfig-2:
     image: shawnyhw6n9/cap-cloudconfig:${TAG}-dev
     ports:
-      - "8002:8002"
+      - "8002:8001"
     depends_on:
       - cloudconfig-1
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.9
   adminserver-1:
     build:
       context: ..
@@ -30,6 +36,9 @@ services:
       - "8088:8088"
     environment:
       - PREFIX_ADMIN_SERVER=admin-server
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.10
   tracing-1:
     build:
       context: ..
@@ -41,6 +50,9 @@ services:
       - "9411:9411"
     environment:
       - PREFIX_TRACING=tracing
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.11
   redis-1:
     container_name: redis-1
     build:
@@ -144,48 +156,52 @@ services:
       - PREFIX_REDIS=redis
     networks:
       extnetwork:
+        ipv4_address: 172.19.0.12
   redis-sentinel1:
     container_name: redis-sentinel1
     build:
       context: ..
       dockerfile: container/sentinel/Dockerfile
     image: shawnyhw6n9/cap-sentinel:${TAG}-dev
-    networks:
-      extnetwork:
     links:
       - redis-1
       - redis-2
       - redis-3
     environment:
       - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.13
   redis-sentinel2:
     container_name: redis-sentinel2
     build:
       context: ..
       dockerfile: container/sentinel/Dockerfile
     image: shawnyhw6n9/cap-sentinel:${TAG}-dev
-    networks:
-      extnetwork:
     links:
       - redis-1
       - redis-2
       - redis-3
     environment:
       - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.14
   redis-sentinel3:
     container_name: redis-sentinel3
     build:
       context: ..
       dockerfile: container/sentinel/Dockerfile
     image: shawnyhw6n9/cap-sentinel:${TAG}-dev
-    networks:
-      extnetwork:
     links:
       - redis-1
       - redis-2
       - redis-3
     environment:
       - PREFIX_REDIS=redis
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.15
   app:
     build:
       context: ..
@@ -209,6 +225,9 @@ services:
       - "redis-4:redis-4"
       - "redis-5:redis-5"
       - "redis-6:redis-6"
+      - "redis-sentinel1:redis-sentinel1"
+      - "redis-sentinel2:redis-sentinel2"
+      - "redis-sentinel3:redis-sentinel3"
     environment:
       - PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
       - PREFIX_ADMIN_SERVER=admin-server
@@ -221,6 +240,9 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.16
 networks:
    extnetwork:
       ipam:
