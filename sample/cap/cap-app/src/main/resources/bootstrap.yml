@@ -2,11 +2,28 @@ spring:
   cloud:
     config:
       name: config
-      profile: dev 
-      uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/config-server
+      profile: dev
+      uri: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/config-server,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8002/config-server
+      #uri: http://localhost:8001/config-server
       label: master
+  boot.admin.client:
+    url: http://${PREFIX_ADMIN_SERVER}-1:8088
+    #url: http://localhost:8088
+  zipkin:
+    base-url: http://${PREFIX_TRACING}-1:9411/
+    #base-url: http://localhost:9411/
+  redis:
+    cluster:
+      nodes: ${PREFIX_REDIS}-1:7000,${PREFIX_REDIS}-2:7001,${PREFIX_REDIS}-3:7100,${PREFIX_REDIS}-4:7101,${PREFIX_REDIS}-5:7200,${PREFIX_REDIS}-6:7201
+      #nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
+    timeout: 500
+#  datasource:
+#    username: sa
+#    password: p@ssw0rd
+#    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8001/eureka
+      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8002/eureka
+      #defaultZone: http://localhost:8001/eureka

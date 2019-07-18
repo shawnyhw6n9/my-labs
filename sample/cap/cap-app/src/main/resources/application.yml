@@ -9,7 +9,27 @@ spring:
       discovery:
         enabled: true
         service-id: CAP-CLOUD-CONFIG-SERVER
-
+  sleuth:
+    sampler:
+      percentage: 0.1
+      #percentage: 1.0
+  redis:
+    jedis:
+      pool:
+        max-wait: 5000
+        max-Idle: 50
+        min-Idle: 5
+#  datasource:
+#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+#        dialect: org.hibernate.dialect.SQLServerDialect
 # spring boot actuator
 info:
   app:
@@ -22,7 +42,18 @@ management:
       exposure:
         include: refresh,health,info
 
-#eureka:
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: refresh,health,info,monitor/hystrix.stream
+management:
+  endpoints:
+    web.exposure.include: "*"
+    shutdown.enabled: true
+endpoints.shutdown.enabled: true
+
+# eureka:
 #  client:
 #    serviceUrl:
 #      defaultZone: http://localhost:8001/eureka,http://localhost:8003/eureka

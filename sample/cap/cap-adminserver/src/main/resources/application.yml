@@ -1,0 +1,40 @@
+server:
+  port: 8088
+  context-path: /
+
+logging:
+  level:
+    .: ERROR
+
+# spring boot actuator
+info:
+  app:
+    name: com.iisigroup.ADMIN-SERVER
+    description: "Spring boot admin Server"
+    version: 5.0.1
+
+management:
+  security:
+    enabled: false
+  port: 8088
+  context-path: /actuator
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  application:
+    name: ADMIN-SERVER
+  boot.admin.client:
+    url: http://${PREFIX_ADMIN_SERVER}-1:8088
+    #url: http://spring-boot-admin:8088
+
+eureka:
+  instance:
+    health-check-url: http://${PREFIX_ADMIN_SERVER}-1:8088/actuator
+    #health-check-url-path: /health
+  client:
+    serviceUrl:
+      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8002/eureka
+      #defaultZone: http://localhost:8001/eureka
