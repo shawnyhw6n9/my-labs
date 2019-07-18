@@ -16,8 +16,10 @@
 4. [Security](https://github.com/shawnyhw6n9/my-labs/tree/security)  
 4.1 [OAuth](https://github.com/shawnyhw6n9/my-labs/tree/security_oauth)  
 4.2 [JWT](https://github.com/shawnyhw6n9/my-labs/tree/security_jwt)  
+4.3 [Code Quality and Security](https://github.com/shawnyhw6n9/my-labs/tree/code_quality_security)  
 5. Container  
 5.1 [Docker](https://github.com/shawnyhw6n9/my-labs/tree/docker)  
+5.2 [Container Image Linter for Security](https://github.com/shawnyhw6n9/my-labs/tree/container_linter_security)  
 6. Administration  
 6.1 [Archetype](https://github.com/shawnyhw6n9/my-labs/tree/archetype)  
 6.2 [Swagger](https://github.com/shawnyhw6n9/my-labs/tree/swagger)  
@@ -26,3 +28,5 @@
 6.5 [Zipkin](https://github.com/shawnyhw6n9/my-labs/tree/opentracing_zipkin)  
 6.6 EFK  
 6.7 Trouble Shooting
+7. Streaming  
+7.1 [Kafka](https://github.com/shawnyhw6n9/my-labs/tree/streming)  
