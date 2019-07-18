@@ -27,14 +27,14 @@ spring:
   application:
     name: ADMIN-SERVER
   boot.admin.client:
-    url: http://${PREFIX_ADMIN_SERVER}-1:8088
+    url: http://172.19.0.10:8088
     #url: http://spring-boot-admin:8088
 
 eureka:
   instance:
-    health-check-url: http://${PREFIX_ADMIN_SERVER}-1:8088/actuator
+    health-check-url: http://172.19.0.10:8088/actuator
     #health-check-url-path: /health
   client:
     serviceUrl:
-      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8002/eureka
+      defaultZone: http://$172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
       #defaultZone: http://localhost:8001/eureka

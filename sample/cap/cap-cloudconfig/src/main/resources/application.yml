@@ -12,10 +12,10 @@ spring:
           uri: https://github.com/shawnyhw6n9/my-labs
           search-paths: config-repo/cap
   boot.admin.client:
-    url: http://${PREFIX_ADMIN_SERVER}-1:8088
+    url: http://172.19.0.10:8088
     #url: http://localhost:8088
   zipkin:
-    base-url: http://${PREFIX_TRACING}-1:9411/
+    base-url: http://172.19.0.11:9411/
     #base-url: http://localhost:9411/
   sleuth:
     sampler:
@@ -31,7 +31,7 @@ eureka:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://${PREFIX_CLOUDCONFIG_SERVER}-1:8001/eureka,http://${PREFIX_CLOUDCONFIG_SERVER}-2:8002/eureka
+      defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
       #defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
 
 logging.level.com.netflix:
