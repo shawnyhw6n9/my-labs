@@ -1,0 +1,261 @@
+➜  my-labs git:(develop) ✗ docker-compose -f container/docker-compose.yml --project-directory container/ up -d
+WARNING: Some services (app) use the 'deploy' key, which will be ignored. Compose does not support 'deploy' configuration - use `docker stack deploy` to deploy to a swarm.
+Creating network "container_extnetwork" with the default driver
+Building cloudconfig-1
+Step 1/13 : FROM openjdk:8-jdk-alpine
+8-jdk-alpine: Pulling from library/openjdk
+e7c96db7181b: Pull complete
+f910a506b6cb: Pull complete
+c2274a1a0e27: Pull complete
+Digest: sha256:94792824df2df33402f201713f932b58cb9de94a0cd524164a0f2283343547b3
+Status: Downloaded newer image for openjdk:8-jdk-alpine
+ ---> a3562aa0b991
+Step 2/13 : VOLUME /tmp
+ ---> Running in ba17180249c1
+Removing intermediate container ba17180249c1
+ ---> 8a44615314ba
+Step 3/13 : ARG JAR_FILE
+ ---> Running in ec97b5d82bdf
+Removing intermediate container ec97b5d82bdf
+ ---> c5bd8dd31789
+Step 4/13 : ARG ARG_PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+ ---> Running in 7fe5ce5484b6
+Removing intermediate container 7fe5ce5484b6
+ ---> f51cbe45caf9
+Step 5/13 : ARG ARG_PREFIX_ADMIN_SERVER=admin-server
+ ---> Running in 7161a04cc4bf
+Removing intermediate container 7161a04cc4bf
+ ---> 87c32e4b4166
+Step 6/13 : ARG ARG_PREFIX_TRACING=tracing
+ ---> Running in 48b47a001dcd
+Removing intermediate container 48b47a001dcd
+ ---> a000bb6bbcd3
+Step 7/13 : ARG ARG_PREFIX_REDIS=redis
+ ---> Running in c092ad83c121
+Removing intermediate container c092ad83c121
+ ---> 94cf5da3b172
+Step 8/13 : ENV PREFIX_CLOUDCONFIG_SERVER=$ARG_PREFIX_CLOUDCONFIG_SERVER
+ ---> Running in 9f0d8b98bfab
+Removing intermediate container 9f0d8b98bfab
+ ---> cc09f492b5ec
+Step 9/13 : ENV PREFIX_ADMIN_SERVER=$ARG_PREFIX_ADMIN_SERVER
+ ---> Running in 61c9fd8acb0b
+Removing intermediate container 61c9fd8acb0b
+ ---> b8dfa47ce6f5
+Step 10/13 : ENV PREFIX_TRACING=$ARG_PREFIX_TRACING
+ ---> Running in 5c0d91c2e6ec
+Removing intermediate container 5c0d91c2e6ec
+ ---> 2541b6cd93e3
+Step 11/13 : ENV PREFIX_REDIS=$ARG_PREFIX_REDIS
+ ---> Running in b267ecab4b36
+Removing intermediate container b267ecab4b36
+ ---> f904d9814ed2
+Step 12/13 : COPY ${JAR_FILE} app.jar
+ ---> 3dc2e73b9c3b
+Step 13/13 : ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar","-Dspring.profiles.active=dev"]
+ ---> Running in d4ab9f454d64
+Removing intermediate container d4ab9f454d64
+ ---> 6c212a1b394f
+
+Successfully built 6c212a1b394f
+Successfully tagged shawnyhw6n9/cap-cloudconfig:5.0.1-dev
+WARNING: Image for service cloudconfig-1 was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building adminserver-1
+Step 1/13 : FROM openjdk:8-jdk-alpine
+ ---> a3562aa0b991
+Step 2/13 : VOLUME /tmp
+ ---> Using cache
+ ---> 8a44615314ba
+Step 3/13 : ARG JAR_FILE
+ ---> Using cache
+ ---> c5bd8dd31789
+Step 4/13 : ARG ARG_PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+ ---> Using cache
+ ---> f51cbe45caf9
+Step 5/13 : ARG ARG_PREFIX_ADMIN_SERVER=admin-server
+ ---> Using cache
+ ---> 87c32e4b4166
+Step 6/13 : ARG ARG_PREFIX_TRACING=tracing
+ ---> Using cache
+ ---> a000bb6bbcd3
+Step 7/13 : ARG ARG_PREFIX_REDIS=redis
+ ---> Using cache
+ ---> 94cf5da3b172
+Step 8/13 : ENV PREFIX_CLOUDCONFIG_SERVER=$ARG_PREFIX_CLOUDCONFIG_SERVER
+ ---> Using cache
+ ---> cc09f492b5ec
+Step 9/13 : ENV PREFIX_ADMIN_SERVER=$ARG_PREFIX_ADMIN_SERVER
+ ---> Using cache
+ ---> b8dfa47ce6f5
+Step 10/13 : ENV PREFIX_TRACING=$ARG_PREFIX_TRACING
+ ---> Using cache
+ ---> 2541b6cd93e3
+Step 11/13 : ENV PREFIX_REDIS=$ARG_PREFIX_REDIS
+ ---> Using cache
+ ---> f904d9814ed2
+Step 12/13 : COPY ${JAR_FILE} app.jar
+ ---> 6e87c71118d2
+Step 13/13 : ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar","-Dspring.profiles.active=dev"]
+ ---> Running in e22f96b0e44c
+Removing intermediate container e22f96b0e44c
+ ---> 940c92dc48da
+
+Successfully built 940c92dc48da
+Successfully tagged shawnyhw6n9/cap-adminserver:5.0.1-dev
+WARNING: Image for service adminserver-1 was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building tracing-1
+Step 1/13 : FROM openjdk:8-jdk-alpine
+ ---> a3562aa0b991
+Step 2/13 : VOLUME /tmp
+ ---> Using cache
+ ---> 8a44615314ba
+Step 3/13 : ARG JAR_FILE
+ ---> Using cache
+ ---> c5bd8dd31789
+Step 4/13 : ARG ARG_PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+ ---> Using cache
+ ---> f51cbe45caf9
+Step 5/13 : ARG ARG_PREFIX_ADMIN_SERVER=admin-server
+ ---> Using cache
+ ---> 87c32e4b4166
+Step 6/13 : ARG ARG_PREFIX_TRACING=tracing
+ ---> Using cache
+ ---> a000bb6bbcd3
+Step 7/13 : ARG ARG_PREFIX_REDIS=redis
+ ---> Using cache
+ ---> 94cf5da3b172
+Step 8/13 : ENV PREFIX_CLOUDCONFIG_SERVER=$ARG_PREFIX_CLOUDCONFIG_SERVER
+ ---> Using cache
+ ---> cc09f492b5ec
+Step 9/13 : ENV PREFIX_ADMIN_SERVER=$ARG_PREFIX_ADMIN_SERVER
+ ---> Using cache
+ ---> b8dfa47ce6f5
+Step 10/13 : ENV PREFIX_TRACING=$ARG_PREFIX_TRACING
+ ---> Using cache
+ ---> 2541b6cd93e3
+Step 11/13 : ENV PREFIX_REDIS=$ARG_PREFIX_REDIS
+ ---> Using cache
+ ---> f904d9814ed2
+Step 12/13 : COPY ${JAR_FILE} app.jar
+ ---> 7f9c263f2dc9
+Step 13/13 : ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar","-Dspring.profiles.active=dev"]
+ ---> Running in c19c9e059ab5
+Removing intermediate container c19c9e059ab5
+ ---> 10606b89a780
+
+Successfully built 10606b89a780
+Successfully tagged shawnyhw6n9/cap-tracing:5.0.1-dev
+WARNING: Image for service tracing-1 was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building redis-1
+Step 1/4 : FROM redis:5.0.5-alpine3.10
+5.0.5-alpine3.10: Pulling from library/redis
+050382585609: Pull complete
+7a3fdc0143e1: Pull complete
+d48f315c369d: Pull complete
+ab70e0f22272: Pull complete
+3348f84e43d0: Pull complete
+ecf40235d2c7: Pull complete
+Digest: sha256:4a09815a6755e372b9ab96a0ed3229cbb34a8d1998ef18f5072278ff2cb86923
+Status: Downloaded newer image for redis:5.0.5-alpine3.10
+ ---> d975eaec5f68
+Step 2/4 : EXPOSE 6379 16379
+ ---> Running in 6268719dd0da
+Removing intermediate container 6268719dd0da
+ ---> 6e1d914a7d08
+Step 3/4 : COPY ./container/redisnode/rediscluster.conf /etc/redis/rediscluster.conf
+ ---> aa9d1e605d3c
+Step 4/4 : ENTRYPOINT redis-server /etc/redis/rediscluster.conf
+ ---> Running in d27d5911e6d8
+Removing intermediate container d27d5911e6d8
+ ---> 97d0f96aeeee
+
+Successfully built 97d0f96aeeee
+Successfully tagged shawnyhw6n9/cap-redisnode:5.0.1-dev
+WARNING: Image for service redis-1 was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building redis-cluster-creator
+Step 1/2 : FROM redis:5.0.5-alpine3.10
+ ---> d975eaec5f68
+Step 2/2 : ENTRYPOINT echo "yes"|redis-cli --cluster create 172.19.0.2:6379 172.19.0.3:6379 172.19.0.4:6379 172.19.0.5:6379 172.19.0.6:6379 172.19.0.7:6379 --cluster-replicas 1
+ ---> Running in 7fc22bf42e52
+Removing intermediate container 7fc22bf42e52
+ ---> b729f314d826
+
+Successfully built b729f314d826
+Successfully tagged shawnyhw6n9/cap-redisclustercreator:5.0.1-dev
+WARNING: Image for service redis-cluster-creator was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building redis-sentinel1
+Step 1/4 : FROM redis:5.0.5-alpine3.10
+ ---> d975eaec5f68
+Step 2/4 : EXPOSE 26379
+ ---> Running in c9b5173a37d9
+Removing intermediate container c9b5173a37d9
+ ---> 123bdfdf2103
+Step 3/4 : COPY ./container/sentinel/sentinel.conf /etc/redis/sentinel.conf
+ ---> 9dd0779b56ec
+Step 4/4 : ENTRYPOINT redis-server /etc/redis/sentinel.conf --sentinel
+ ---> Running in ffa8a643d736
+Removing intermediate container ffa8a643d736
+ ---> 9a25063a2131
+
+Successfully built 9a25063a2131
+Successfully tagged shawnyhw6n9/cap-sentinel:5.0.1-dev
+WARNING: Image for service redis-sentinel1 was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building app
+Step 1/13 : FROM openjdk:8-jdk-alpine
+ ---> a3562aa0b991
+Step 2/13 : VOLUME /tmp
+ ---> Using cache
+ ---> 8a44615314ba
+Step 3/13 : ARG JAR_FILE
+ ---> Using cache
+ ---> c5bd8dd31789
+Step 4/13 : ARG ARG_PREFIX_CLOUDCONFIG_SERVER=cloudconfig-server
+ ---> Using cache
+ ---> f51cbe45caf9
+Step 5/13 : ARG ARG_PREFIX_ADMIN_SERVER=admin-server
+ ---> Using cache
+ ---> 87c32e4b4166
+Step 6/13 : ARG ARG_PREFIX_TRACING=tracing
+ ---> Using cache
+ ---> a000bb6bbcd3
+Step 7/13 : ARG ARG_PREFIX_REDIS=redis
+ ---> Using cache
+ ---> 94cf5da3b172
+Step 8/13 : ENV PREFIX_CLOUDCONFIG_SERVER=$ARG_PREFIX_CLOUDCONFIG_SERVER
+ ---> Using cache
+ ---> cc09f492b5ec
+Step 9/13 : ENV PREFIX_ADMIN_SERVER=$ARG_PREFIX_ADMIN_SERVER
+ ---> Using cache
+ ---> b8dfa47ce6f5
+Step 10/13 : ENV PREFIX_TRACING=$ARG_PREFIX_TRACING
+ ---> Using cache
+ ---> 2541b6cd93e3
+Step 11/13 : ENV PREFIX_REDIS=$ARG_PREFIX_REDIS
+ ---> Using cache
+ ---> f904d9814ed2
+Step 12/13 : COPY ${JAR_FILE} app.jar
+ ---> b04b8db8e500
+Step 13/13 : ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar","-Dspring.profiles.active=dev"]
+ ---> Running in 01b8cc0060af
+Removing intermediate container 01b8cc0060af
+ ---> 64a0303af46d
+
+Successfully built 64a0303af46d
+Successfully tagged shawnyhw6n9/cap-app:5.0.1-dev
+WARNING: Image for service app was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Creating container_adminserver-1_1 ... done
+Creating redis-3                   ... done
+Creating redis-1                   ... done
+Creating container_tracing-1_1     ... done
+Creating redis-5                   ... done
+Creating container_cloudconfig-1_1 ... done
+Creating container_cloudconfig-2_1 ... done
+Creating redis-4                   ... done
+Creating redis-2                   ... done
+Creating redis-6                   ... done
+Creating redis-sentinel2                   ... done
+Creating redis-sentinel1                   ... done
+Creating redis-sentinel3                   ... done
+Creating container_redis-cluster-creator_1 ... done
+Creating container_app_1                   ... done
+➜  my-labs git:(develop) ✗
