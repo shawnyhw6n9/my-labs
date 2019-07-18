@@ -24,11 +24,12 @@ import com.iisigroup.cap.app.CapApplication;
 
 /**
  * <pre>
- * TODO Write a short description on the purpose of the program
+ * After start redis cluster , Test get value from Redis
  * </pre>
  * 
  * @since Jun 6, 2019
  * @author Sunkist Wang
+ * @see cap-app/src/main/resources/redis-cluster/README.md
  * @version
  *          <ul>
  *          <li>Jun 6, 2019,Sunkist Wang,new

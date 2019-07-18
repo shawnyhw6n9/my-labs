@@ -5,7 +5,7 @@
     <parent>
         <artifactId>cap</artifactId>
         <groupId>com.iisigroup.cap</groupId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
     </parent>
     <artifactId>cap-app</artifactId>
     <name>cap-app</name>
@@ -15,7 +15,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
     <packaging>jar</packaging>
-<!--     <packaging>war</packaging> -->
+    <!-- <packaging>war</packaging> -->
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -100,10 +100,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.iisigroup.cap</groupId>
-            <artifactId>cap-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
