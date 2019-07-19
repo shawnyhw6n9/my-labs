@@ -48,7 +48,7 @@ public class CustomerManagementImpl implements CustomerManagement {
         customers = customerRepository.findByLastName("Wang");
         for (Customer customer : customers) {
             customer.setLastName("Einstein");
-            stringBuilder.append(customer.toString()).append("\n");
+            stringBuilder.append(customer.toString()).append("${symbol_es}"+ "n");
         }
         return stringBuilder.toString();
     }
