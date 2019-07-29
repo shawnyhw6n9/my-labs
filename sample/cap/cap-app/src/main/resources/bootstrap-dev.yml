@@ -19,8 +19,13 @@ spring:
   #   cluster:
   #     nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
     timeout: 500
+  security.user:
+    name: user
+    password: passowrd
 
 eureka:
+  instance:
+    health-check-url: http://localhost:8080/actuator
   client:
     serviceUrl:
       defaultZone: http://localhost:8001/eureka
