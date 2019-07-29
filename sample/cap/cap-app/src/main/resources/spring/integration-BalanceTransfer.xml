@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+    xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:ws="http://www.springframework.org/schema/integration/ws"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/stream
+            http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd">
+
+    <!-- CHANNEL -->
+    <int:channel id="offusTransferChannel" />
+
+    <int-http:inbound-gateway id="inboundTransferController" request-channel="offusTransferChannel" reply-channel="replyChannel" error-channel="failedChannel"
+        supported-methods="POST" path="/offusTransfer" request-payload-type="com.iisigroup.gw.app.domain.TransferRequest">
+
+        <int-http:request-mapping consumes="application/json" produces="application/json" />
+    </int-http:inbound-gateway>
+
+    <int:service-activator ref="enmTransferEndpoint" method="offusTransfer" input-channel="offusTransferChannel" output-channel="replyChannel" />
+    
+</beans>

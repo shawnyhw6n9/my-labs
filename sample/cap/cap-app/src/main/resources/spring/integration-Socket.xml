@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+    xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:ws="http://www.springframework.org/schema/integration/ws"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/stream
+            http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd">
+
+    <int:channel id="input" />
+    <int:channel id="input2" />
+    <int:channel id="input3" />
+    <int:channel id="clientBytes2string" />
+    <int:channel id="xmlToJSONChannel" />
+
+    <bean id="balanceInquiryTransformer" class="com.iisigroup.socket.app.transformer.BalanceInquiryTransformer" />
+
+    <bean id="balanceInquiryXmlToJSONTransformer" class="com.iisigroup.socket.app.transformer.BalanceInquiryXmlToJSONTransformer" />
+
+    <bean id="clientHex2StringTransformerHandler" class="com.iisigroup.socket.app.transformer.ClientHex2StringTransformer" />
+
+
+    <!-- <import resource="classpath:spring/integration_socket.xml" /> -->
+    <int:service-activator ref="balanceInquiryJson2Object" method="doTransform" input-channel="input" output-channel="input2" />
+
+    <bean id="balanceInquiryJson2Object" class="com.iisigroup.socket.app.endpoint.BalanceInquiryJson2Object" />
+
+    <int-ip:tcp-connection-factory id="client" type="client" host="localhost" port="5566" single-use="true" so-timeout="100000" />
+
+    <int-ip:tcp-outbound-gateway id="outGateway" request-channel="input3" reply-channel="clientBytes2string" connection-factory="client" request-timeout="100000"
+        reply-timeout="100000">
+        <int-ip:request-handler-advice-chain>
+            <ref bean="retryAdvice" />
+            <!-- <ref bean="circuitBreakerAdvice" /> -->
+        </int-ip:request-handler-advice-chain>
+    </int-ip:tcp-outbound-gateway>
+
+    <int:transformer id="clientTransformer" ref="balanceInquiryTransformer" input-channel="input2" output-channel="input3" />
+
+    <int:transformer id="clientHex2StringTransformer" ref="clientHex2StringTransformerHandler" input-channel="clientBytes2string" output-channel="xmlToJSONChannel" />
+
+    <int:transformer id="xmlToJSONTransformer" ref="balanceInquiryXmlToJSONTransformer" input-channel="xmlToJSONChannel" output-channel="replyChannel" />
+
+    <!-- <int:transformer id="errorHandler" input-channel="errorChannel" expression="payload.failedMessage.payload + ':' + payload.cause.message" /> -->
+</beans>

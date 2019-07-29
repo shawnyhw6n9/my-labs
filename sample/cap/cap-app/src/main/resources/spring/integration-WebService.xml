@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+    xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:ws="http://www.springframework.org/schema/integration/ws"
+    xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+    xsi:schemaLocation="http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/xml http://www.springframework.org/schema/integration/xml/spring-integration-xml-5.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd">
+
+    <int:channel id="unmarshallerChannel" />
+    <int:channel id="marshallerChannel" />
+    <int:channel id="objectToStringChannel" />
+    <int:channel id="webServiceChannel" />
+
+    <!-- <int:service-activator ref="webServiceEndpoint" method="produce" input-channel="webServiceChannel" output-channel="replyChannel" /> -->
+
+    <!-- <int:service-activator ref="webServiceEndpoint" method="consume" input-channel="webServiceChannel" output-channel="replyChannel" /> -->
+
+    <int-http:inbound-gateway id="inboundWebServiceController" request-channel="unmarshallerChannel" reply-channel="replyChannel" error-channel="failedChannel"
+        supported-methods="POST" path="/webService">
+
+        <int-http:request-mapping consumes="application/xml" produces="application/xml" />
+    </int-http:inbound-gateway>
+
+    <int-xml:unmarshalling-transformer id="unmarshaller" input-channel="unmarshallerChannel" output-channel="marshallerChannel" unmarshaller="marshallerUnmarshaller" />
+
+    <bean id="marshallerUnmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="classesToBeBound">
+            <list>
+                <value>com.iisigroup.gw.app.domain.TransferRequest</value>
+                <value>com.iisigroup.gw.app.domain.TransferResponse</value>
+            </list>
+        </property>
+    </bean>
+
+    <int-xml:marshalling-transformer id="marshaller" input-channel="marshallerChannel" output-channel="objectToStringChannel" marshaller="marshallerUnmarshaller" result-type="StringResult" />
+    
+    <int:object-to-string-transformer input-channel="objectToStringChannel" output-channel="webServiceChannel" charset="UTF-8" />
+
+    <!-- This chain receives from the 'fahrenheitChannel' and enriches the request Message by adding the "soap-action" header value. Then, the Web Service outbound Messaging Gateway invokes the Web Service 
+        for the given URI, and the reply Message is sent to the 'celsiusChannel'. -->
+
+    <!-- <int-xml:xpath-filter xpath-expression-ref="selectPcodeXpath" input-channel="webServiceChannel" output-channel="replyChannel"> -->
+    <!-- </int-xml:xpath-filter> -->
+
+    <!-- <int-xml:xpath-expression id="selectPcodeXpath" expression="/TransferRequest"> -->
+    <!-- </int-xml:xpath-expression> -->
+
+    <!-- <bean id="unmarshallingTransformer" class="org.springframework.integration.xml.transformer.UnmarshallingTransformer"> -->
+    <!-- <constructor-arg> -->
+    <!-- <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller"> -->
+    <!-- <property name="contextPath" value="com.iisigroup.gw.app.domain" /> -->
+    <!-- </bean> -->
+    <!-- </constructor-arg> -->
+    <!-- </bean> -->
+
+    <!-- <int-xml:unmarshalling-transformer id="defaultUnmarshaller" input-channel="webServiceChannel" output-channel="replyChannel" -->
+    <!-- unmarshaller="unmarshallingTransformer" /> -->
+
+    <!-- converter="testXmlPayloadConverter" -->
+
+    <!-- <int-xml:marshalling-transformer marshaller="marshallingTransformer" input-channel="transformerChannel" output-channel="replyChannel" result-type="com.iisigroup.gw.app.domain.TransferRequest" 
+        /> -->
+    <!-- <bean class="org.springframework.integration.xml.transformer.MarshallingTransformer"/> -->
+    <int:chain input-channel="webServiceChannel" output-channel="replyChannel">
+        <ws:header-enricher>
+            <ws:soap-action value="http://www.w3schools.com/xml/FahrenheitToCelsius" />
+        </ws:header-enricher>
+        <ws:outbound-gateway uri="http://localhost:8080/ws-inbound-gateway/echoservice" reply-timeout="100000" >
+            <ws:request-handler-advice-chain>
+                <ref bean="retryAdvice" />
+            </ws:request-handler-advice-chain>
+        </ws:outbound-gateway>
+    </int:chain>
+
+    <!-- The response from the service is logged to the console. -->
+    <!-- <stream:stdout-channel-adapter id="celsiusChannel" /> -->
+</beans>

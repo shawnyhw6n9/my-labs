@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+    xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:ws="http://www.springframework.org/schema/integration/ws"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/stream
+            http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd">
+
+<!-- CHANNEL -->
+    <!-- <int:channel id="ftpChannel" /> -->
+    <!-- <int:channel id="mailChannel" /> -->
+    <!-- <int:channel id="efiscChannel" /> -->
+    <!-- <int:channel id="kafkaChannel" /> -->
+    <int:channel id="replyChannel">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel" />
+        </int:interceptors>
+    </int:channel>
+    <int:channel id="failedChannel" />
+
+    <int:chain input-channel="failedChannel">
+        <int:transformer
+            expression="{failed: payload.cause==null?'A circuit breaker stops calling a failing service after threshold failures.':(payload.cause.message==null?'A circuit breaker stops calling a failing service after threshold failures.':payload.cause.message) }" />
+    </int:chain>
+
+    <import resource="integration-ATMCDID.xml" />
+    <import resource="integration-BalanceInquiry.xml" />
+    <import resource="integration-BalanceTransfer.xml" />
+
+    <int:wire-tap channel="loggingChannel" pattern="atmCdid*,balanceInquiry*,offusTransfer*,webService*,failed*,input*,clientBytes2String*,bytes2String*,balanceIn*,balanceOut*,aggrOut*,splitIn*,marshaller*,unmarshaller*,objectToString*" />
+
+    <int:logging-channel-adapter id="loggingChannel" log-full-message="true" level="DEBUG" />
+
+    <bean id="circuitBreakerAdvice" class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
+        <property name="threshold" value="2" />             <!-- close after 2 failures -->
+        <property name="halfOpenAfter" value="5000" />     <!-- half open after 15 seconds -->
+    </bean>
+
+    <bean id="retryAdvice" class="org.springframework.integration.handler.advice.RequestHandlerRetryAdvice">
+        <!-- retry template -->
+        <property name="retryTemplate">
+            <bean class="org.springframework.retry.support.RetryTemplate">
+                <property name="backOffPolicy">
+                    <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+                        <property name="initialInterval" value="1000" />
+                        <property name="multiplier" value="3" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <!-- recover callback -->
+        <!-- <property name="recoveryCallback"> -->
+        <!-- <bean class="org.springframework.integration.handler.advice.ErrorMessageSendingRecoverer"> -->
+        <!-- <constructor-arg ref="recoveryChannel" /> -->
+        <!-- </bean> -->
+        <!-- </property> -->
+    </bean>
+
+    <!-- <int:channel id="recoveryChannel" /> -->
+    <!-- <int:chain input-channel="recoveryChannel"> -->
+    <!-- <int:transformer expression="'permanently failed:' + payload.failedMessage.payload + ' handled by recovery'" /> -->
+    <!-- </int:chain> -->
+
+    <import resource="integration-Socket.xml" />
+    <import resource="integration-WebService.xml" />
+    <import resource="integration-SplitAggregator.xml" />
+    <import resource="integration-Socket-Server.xml" />
+</beans>
