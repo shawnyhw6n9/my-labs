@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * <pre>
@@ -30,6 +31,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  *          </ul>
  */
 @Configuration
+@EnableRedisHttpSession
 public class RedisClusterConfiguration {
 
     @Bean

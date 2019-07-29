@@ -5,27 +5,23 @@ spring:
     config:
       name: config
       profile: dev
-      uri: http://localhost:8001/config-server
-      # uri: http://172.19.0.8:8001/config-server,http://172.19.0.9:8001/config-server
+      uri: http://172.19.0.8:8001/config-server,http://172.19.0.9:8001/config-server
       label: master
   boot.admin.client:
-    url: http://localhost:8088
-    # url: http://172.19.0.10:8088
+    url: http://172.19.0.10:8088
   zipkin:
-    base-url: http://localhost:9411/
-    # base-url: http://172.19.0.11:9411/
-  redis:
-    cluster:
-      nodes: localhost:7000,localhost:7100,localhost:7200,localhost:7001,localhost:7101,localhost:7201
-      # nodes: 172.19.0.2:6379,172.19.0.3:6379,172.19.0.4:6379,172.19.0.5:6379,172.19.0.6:6379,172.19.0.7:6379
-    timeout: 500
-#  datasource:
-#    username: sa
-#    password: p@ssw0rd
-#    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
+    base-url: http://172.19.0.11:9411/
+  # redis:
+  #   cluster:
+  #     nodes: 172.19.0.2:6379,172.19.0.3:6379,172.19.0.4:6379,172.19.0.5:6379,172.19.0.6:6379,172.19.0.7:6379
+  #   timeout: 500
+  datasource:
+    username: sa
+    password: p@ssw0rd
+    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
+    # url: jdbc:sqlserver://sssrv01.iead.local:3433;DatabaseName=SAMPLEDB;SelectMethod=direct
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8001/eureka
-      # defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
+      defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka

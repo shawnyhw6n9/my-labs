@@ -10,4 +10,4 @@ ENV PREFIX_ADMIN_SERVER=$ARG_PREFIX_ADMIN_SERVER
 ENV PREFIX_TRACING=$ARG_PREFIX_TRACING
 ENV PREFIX_REDIS=$ARG_PREFIX_REDIS
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar"]
+ENTRYPOINT ["java","-Xmx512m","-Xss512k","-jar","/app.jar","-Dspring.profiles.active=dev"]

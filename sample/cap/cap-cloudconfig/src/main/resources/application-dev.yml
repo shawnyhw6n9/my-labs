@@ -9,20 +9,15 @@ spring:
       server:
         prefix: /config-server
         git:
-          uri: https://github.com/shawnyhw6n9/my-labs/
-          timeout: 4
+          uri: file:///${user.home}/Documents/study/study_microservices_poc/my-labs
           search-paths: config-repo/cap
-          skipSslValidation: true
   boot.admin.client:
-    url: http://172.19.0.10:8088
-    #url: http://localhost:8088
+    url: http://localhost:8088
   zipkin:
-    base-url: http://172.19.0.11:9411/
-    #base-url: http://localhost:9411/
+    base-url: http://localhost:9411/
   sleuth:
     sampler:
-      percentage: 0.1
-      #percentage: 1.0
+      percentage: 1.0
 
 management:
   endpoints:
@@ -37,8 +32,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
-      #defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
 
 logging.level.com.netflix:
   eureka: DEBUG
