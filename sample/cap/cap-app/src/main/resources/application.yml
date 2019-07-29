@@ -12,6 +12,11 @@ spring:
   sleuth:
     sampler:
       percentage: 0.1
+  # session:
+  #   redis:
+  #     flush-mode: on-save # Sessions flush mode.
+  #     namespace: spring:session # Namespace for keys used to store sessions.
+  #   store-type: redis
   # redis:
   #   jedis:
   #     pool:
