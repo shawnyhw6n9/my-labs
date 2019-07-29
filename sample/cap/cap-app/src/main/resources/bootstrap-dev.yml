@@ -21,7 +21,7 @@ spring:
     timeout: 500
   security.user:
     name: user
-    password: passowrd
+    password: password
 
 eureka:
   instance:
