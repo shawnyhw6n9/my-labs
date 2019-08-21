@@ -12,12 +12,22 @@
 `cluster meet 127.0.0.1 7101`  
 `cluster meet 127.0.0.1 7201`  
 4. Replicate master as slave  
-`CLUSTER REPLICATE XXXX`  
+`cluster nodes`  
+`redis-cli -p 7001`  
+`cluster replicate XXXX`  
+`redis-cli -p 7101`  
+`cluster replicate XXXX`  
+`redis-cli -p 7201`  
+`cluster replicate XXXX`  
 5. View Cluster info  
 `cluster info`  
 `cluster slots`  
 6. Set key-value  
+`redis-cli -c -p 7000`  
 `set key1 value1`  
+`get key1`  
+`keys "*"`  
+`redis-cli -c -p 7201`  
 `get key1`  
 `keys "*"`  
 7. Run JUnit test program - RedisClusterTester.java
