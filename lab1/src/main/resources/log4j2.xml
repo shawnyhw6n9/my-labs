@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 6個優先級從高到低依次為：OFF、FATAL、ERROR、WARN、INFO、DEBUG、TRACE、 ALL。如果設置優先級為WARN，那麼OFF、FATAL、ERROR、WARN 4個級別的log能正常輸出設置為OFF 表示不記錄log4j2本身的日誌， -->
+<!-- status：用來指定log4j本身的打印日誌級別,monitorInterval:指定log4j自動重新配置的監測間隔時間 -->
+<configuration status="INFO" monitorInterval="30">
+    <!-- 自己設置屬性，後面通過${}來訪問 -->
+    <properties>
+        <property name="LOG_HOME">logs</property>
+        <property name="PATTERN">%d [%t] [%X{sessionId}] | %X{login} | %X{reqURI} | %-28.28c{1} [%-5p] %m%n</property>
+
+    </properties>
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="ALL" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="${PATTERN}" />
+        </Console>
+        <RollingFile name="RollingFileApp" fileName="${LOG_HOME}/app.log" filePattern="${LOG_HOME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="${PATTERN}" />
+            <SizeBasedTriggeringPolicy size="10MB" />
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <root level="INFO">
+            <appender-ref ref="Console" />
+            <appender-ref ref="RollingFileApp" />
+        </root>
+    </loggers>
+</configuration>

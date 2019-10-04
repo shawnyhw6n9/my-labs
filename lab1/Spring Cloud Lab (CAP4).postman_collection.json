@@ -1,0 +1,201 @@
+{
+	"info": {
+		"_postman_id": "333b2bf2-f7c2-41f7-8bea-815ab452f4f6",
+		"name": "Spring Cloud Lab (CAP4)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "a. Spring Cloud Config",
+			"item": [
+				{
+					"name": "1. config server - 8001 (label=master, application=config, profile=dev)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8001/config-server/config/dev/master",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"config-server",
+								"config",
+								"dev",
+								"master"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. config client (controller=configs)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/configs",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"configs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Refresh load from remote config-repo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/actuator/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.1 actuator health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.2 actuator info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/actuator/info",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. http://localhost:8001 (eureka)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.1 http://localhost:8003 (eureka)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8003",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8003"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Backup config server - 8003 (label=master, application=config, profile=dev)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8003/config-server/config/dev/master",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"config-server",
+								"config",
+								"dev",
+								"master"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
