@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <springfox-swagger.version>3.0.0-SNAPSHOT</springfox-swagger.version>
-        <spirng-boot-admin.version>2.1.5</spirng-boot-admin.version>
+        <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
         <zipkin.version>2.11.7</zipkin.version>
     </properties>
     <repositories>
