@@ -27,6 +27,7 @@
 6.4 Consul  
 6.5 [Zipkin](https://github.com/shawnyhw6n9/my-labs/tree/opentracing_zipkin)  
 6.6 EFK  
-6.7 Trouble Shooting
+6.7 Trouble Shooting  
+6.8 [Task](https://github.com/shawnyhw6n9/my-labs/tree/task)  
 7. Streaming  
 7.1 [Kafka](https://github.com/shawnyhw6n9/my-labs/tree/streming)  
