@@ -11,8 +11,11 @@
  */
 package com.iisigroup.cap.app.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,13 +35,12 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  *          </ul>
  */
 @Configuration
+@EnableCaching
 @EnableRedisHttpSession
-public class RedisClusterConfiguration {
+public class RedisConfig {
 
-    @Bean
-    public JedisConnectionFactory connectionFactory() {
-        return new JedisConnectionFactory();
-    }
+    @Autowired
+    ClusterConfigurationProperties clusterProperties;
 
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
@@ -48,5 +50,10 @@ public class RedisClusterConfiguration {
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisConnectionFactory connectionFactory() {
+        return new JedisConnectionFactory(new RedisClusterConfiguration(clusterProperties.getNodes()));
     }
 }
