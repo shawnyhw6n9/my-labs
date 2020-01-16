@@ -79,3 +79,11 @@ logging:
 
 #swaggerConfig:
   #apiVersion: ${project.version}
+
+jwt:
+  secret: mySecret
+  expiration: 604800
+  header: Authorization
+  tokenHead: "Bearer " 
+  route.authentication.path: auth
+  route.authentication.refresh: refresh
