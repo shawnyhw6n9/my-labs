@@ -23,6 +23,8 @@ spring:
         max-wait: 5000
         max-Idle: 50
         min-Idle: 5
+  datasource:
+    driver-class-name: org.h2.Driver
   jpa:
     show-sql: true
     hibernate:
@@ -49,7 +51,13 @@ management:
     web.exposure.include: "*"
     health.sensitive: false
     shutdown.enabled: true
-  endpoint.health.show-details: ALWAYS
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: ALWAYS
+    redis:
+      enabled: false
 endpoints.shutdown.enabled: true
 
 security.oauth2.resource.filter-order: 3
@@ -61,7 +69,7 @@ security.oauth2.resource.filter-order: 3
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     com:
       netflix:
         eureka: DEBUG

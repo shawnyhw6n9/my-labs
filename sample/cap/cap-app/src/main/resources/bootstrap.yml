@@ -17,11 +17,14 @@ spring:
   #   timeout: 500
   datasource:
     username: sa
-    password: p@ssw0rd
-    url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
-    # url: jdbc:sqlserver://sssrv01.iead.local:3433;DatabaseName=SAMPLEDB;SelectMethod=direct
+    #password: p@ssw0rd
+    #url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
+    #url: jdbc:sqlserver://sssrv01.iead.local:3433;DatabaseName=MLDEMO;SelectMethod=direct
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
+      #defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
+      # vim /etc/hosts , and add a line
+      # 192.168.36.47 eureka-demo-rce.apps.example.com
+      defaultZone: http://eureka-demo-rce.apps.example.com/eureka

@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -52,8 +51,13 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    // @Bean
+    // public RedisConnectionFactory connectionFactory() {
+    // return new JedisConnectionFactory(new RedisClusterConfiguration(clusterProperties.getNodes()));
+    // }
+
     @Bean
     public RedisConnectionFactory connectionFactory() {
-        return new JedisConnectionFactory(new RedisClusterConfiguration(clusterProperties.getNodes()));
+        return new JedisConnectionFactory();
     }
 }
