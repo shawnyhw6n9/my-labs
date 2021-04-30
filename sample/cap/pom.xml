@@ -12,7 +12,7 @@
         <!-- <spring-cloud-netflix.version>1.4.6.RELEASE</spring-cloud-netflix.version> -->
         <spring-data.version>Lovelace-SR8</spring-data.version>
         <querydsl.version>4.1.3</querydsl.version>
-        <spring.version>5.1.6.RELEASE</spring.version>
+        <spring.version>5.1.18.RELEASE</spring.version>
         <spring-security.version>4.1.0.RELEASE</spring-security.version>
         <localRepositoryPath>src/localRepos</localRepositoryPath>
         <hibernate.version>5.2.1.Final</hibernate.version>
