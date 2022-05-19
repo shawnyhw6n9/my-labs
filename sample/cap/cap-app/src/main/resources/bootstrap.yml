@@ -3,13 +3,16 @@ spring:
     name: CAP
   cloud:
     config:
+      enabled: false
       name: config
       profile: dev
       uri: http://172.19.0.8:8001/config-server,http://172.19.0.9:8001/config-server
       label: master
   boot.admin.client:
+    enabled: false 
     url: http://172.19.0.10:8088
   zipkin:
+    enabled: false
     base-url: http://172.19.0.11:9411/
   # redis:
   #   cluster:
@@ -23,6 +26,7 @@ spring:
 
 eureka:
   client:
+    enabled: false
     serviceUrl:
       #defaultZone: http://172.19.0.8:8001/eureka,http://172.19.0.9:8001/eureka
       # vim /etc/hosts , and add a line

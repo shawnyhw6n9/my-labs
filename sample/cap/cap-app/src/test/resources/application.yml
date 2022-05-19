@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  sleuth:
+    sampler:
+      percentage: 0.1
+
+# spring boot actuator
+info:
+  app:
+    name: com.iisigroup.cap.app.CAP
+    description: Cap by Spring Boot Application
+    version: 5.0.1
+
+management:
+  endpoints:
+    web.exposure.include: "*"
+    health.sensitive: false
+    shutdown.enabled: true
+  endpoint.health.show-details: ALWAYS
+#endpoints.shutdown.enabled: true
+
+security.oauth2.resource.filter-order: 3
+
+logging:
+  level:
+    ROOT: INFO
+    com:
+      netflix:
+        eureka: DEBUG
+        discovery: DEBUG
+    org:
+      hibernate.type: WARN

@@ -12,17 +12,17 @@ spring:
   sleuth:
     sampler:
       percentage: 1.0
-  session:
-    redis:
-      flush-mode: on-save # Sessions flush mode.
-      namespace: spring:session # Namespace for keys used to store sessions.
-    store-type: redis
-  redis:
-    jedis:
-      pool:
-        max-wait: 5000
-        max-Idle: 50
-        min-Idle: 5
+#  session:
+#    redis:
+#      flush-mode: on-save # Sessions flush mode.
+#      namespace: spring:session # Namespace for keys used to store sessions.
+#    store-type: redis
+#  redis:
+#    jedis:
+#      pool:
+#        max-wait: 5000
+#        max-Idle: 50
+#        min-Idle: 5
   datasource:
     driver-class-name: org.h2.Driver
   jpa:
@@ -56,8 +56,8 @@ management:
       enabled: true
     health:
       show-details: ALWAYS
-    redis:
-      enabled: false
+#    redis:
+#      enabled: false
 endpoints.shutdown.enabled: true
 
 security.oauth2.resource.filter-order: 3

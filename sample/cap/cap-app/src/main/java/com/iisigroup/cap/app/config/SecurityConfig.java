@@ -63,31 +63,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-// @formatter:off
-        http
-        .authorizeRequests()
+        // @formatter:off
+        http.authorizeRequests()
         .antMatchers("/actuator/hystrix.stream").permitAll()
         .antMatchers("/turbine.stream").permitAll()
         .antMatchers("/swagger-ui.html").permitAll()
-        .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
-        .antMatchers("/swagger-resources/**").permitAll()
-        .antMatchers("/v2/api-docs").permitAll()
-        .antMatchers("/actuator/**").permitAll()
-        .antMatchers("/"+ authPath).permitAll()
-        .antMatchers("/"+ refreshPath).permitAll()
-        .anyRequest().authenticated()
-        .and()
-        .httpBasic()
-        .and()
-        .csrf().disable()
-        ;
-        http
-                .antMatcher("/**")
-        .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        .and()
-        .addFilterAfter(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
-        ;
-// @formatter:on
+                .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/doc/**").permitAll()
+                .antMatchers("/" + authPath).permitAll()
+                .antMatchers("/" + refreshPath).permitAll()
+                .anyRequest().authenticated().and().httpBasic().and().csrf().disable();
+        http.antMatcher("/**").exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and().addFilterAfter(authenticationTokenFilterBean(),
+                UsernamePasswordAuthenticationFilter.class);
+        // @formatter:on
     }
 
     @Override

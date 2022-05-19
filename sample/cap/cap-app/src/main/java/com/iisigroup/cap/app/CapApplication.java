@@ -1,11 +1,16 @@
 package com.iisigroup.cap.app;
 
+import org.bson.Document;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * <pre>
@@ -19,8 +24,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  *          <li>May 2, 2019,Sunkist Wang,new
  *          </ul>
  */
-@EnableDiscoveryClient
-@EnableJpaRepositories("com.iisigroup.cap.app.repositories")
+//@EnableDiscoveryClient
+//@EnableJpaRepositories("com.iisigroup.cap.app.repositories")
 @SpringBootApplication
 public class CapApplication extends SpringBootServletInitializer {
 
