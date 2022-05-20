@@ -29,3 +29,14 @@ dist/*
 dump.rdb
 nodes-*.conf
 
+# Eclipse
+.settings/
+target/
+.*
+
+# TEMPPPPPPPPPPPPPPPPPPP Project
+sample/UTY-Angular1/
+sample/gs-reactive-rest-service/
+sample/ng/
+sample/rx-app/
+

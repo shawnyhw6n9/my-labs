@@ -147,6 +147,8 @@ public class DocController {
             }
 
             if (findOutDoc != null) {
+                
+                findOutDoc.put(REQUEST_DEVICE_ID, requestMbId);
 
                 if (buff.length() > 0) {
                     buff.append(",");
