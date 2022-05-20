@@ -18,8 +18,8 @@ spring:
   #   cluster:
   #     nodes: 172.19.0.2:6379,172.19.0.3:6379,172.19.0.4:6379,172.19.0.5:6379,172.19.0.6:6379,172.19.0.7:6379
   #   timeout: 500
-  datasource:
-    username: sa
+  #datasource:
+    #username: sa
     #password: p@ssw0rd
     #url: jdbc:sqlserver://localhost:1433;DatabaseName=SAMPLEDB;SelectMethod=direct
     #url: jdbc:sqlserver://sssrv01.iead.local:3433;DatabaseName=MLDEMO;SelectMethod=direct
