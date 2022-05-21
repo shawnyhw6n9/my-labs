@@ -215,7 +215,7 @@ public class DocController {
      * @return
      */
     private Object getUUID() {
-        return "A" + genRandInt(100000000, 999999999);
+        return "A" + genRandInt(100000000, 999999999)+ "B"+ genRandInt(100000000, 999999999);
     }
 
     /**
