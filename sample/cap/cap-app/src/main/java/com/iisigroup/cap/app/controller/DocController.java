@@ -116,12 +116,13 @@ public class DocController {
 
                     // 需要新增 Doc
 
-                    Document document = new Document(GOLOBAL_ID, getUUID()).append(DEVICE_ID, requestMbId);
+                    Document document = new Document(GOLOBAL_ID, getUUID()).append(REQUEST_DEVICE_ID, requestMbId);
 
                     document.remove(OBJECT_ID);
                     buff.append(document.toJson());
 
                     mbList.add(requestMbId);
+                    document.remove(REQUEST_DEVICE_ID);
                     document.append(DEVICE_ID, mbList);
 
                     mongoCollection.insertOne(document);
@@ -141,7 +142,10 @@ public class DocController {
 
                 // 依篩選條件更新 Doc
 
-                Document document = new Document(UNIVERSAL_ID, requestId).append(DEVICE_ID, mbList);
+                Document document = new Document(DEVICE_ID, mbList);
+                if (!requestId.isEmpty()) {
+                    document.append(UNIVERSAL_ID, requestId);
+                }
                 mongoCollection.updateMany(Filters.or(Filters.in(DEVICE_ID, requestMbId), Filters.eq(DEVICE_ID, requestMbId)), new Document("$set", document));
 
             }
@@ -255,7 +259,7 @@ public class DocController {
 
             MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
-            // CASE I : 依 Device Id 篩選查找
+            // CASE A : 依 Device Id 篩選查找
             FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId))).limit(1);
 
             mongoCollection.deleteMany(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId)));
