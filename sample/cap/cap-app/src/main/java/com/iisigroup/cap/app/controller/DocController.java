@@ -50,18 +50,18 @@ import com.mongodb.client.model.Filters;
  */
 @RestController
 @RequestMapping("/doc")
-@ConfigurationProperties(prefix = "mogodb.doc")
+@ConfigurationProperties(prefix = "mongodb.doc")
 public class DocController {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    // @Value("${mogodb.doc.uri:}")
+    // @Value("${mongodb.doc.uri:}")
     private String uri;
 
-    // @Value("${mogodb.doc.database:}")
+    // @Value("${mongodb.doc.database:}")
     private String database;
 
-    // @Value("${mogodb.doc.collection:}")
+    // @Value("${mongodb.doc.collection:}")
     private String collection;
 
     public static final String REQUEST_DEVICE_ID = "MBID";

@@ -88,7 +88,7 @@ jwt:
   route.authentication.path: auth
   route.authentication.refresh: refresh
 
-mogodb.doc:
+mongodb.doc:
 #  uri: mongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tag
 #  database: "stage"
 #  collection: "array_test"
