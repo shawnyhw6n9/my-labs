@@ -20,7 +20,9 @@ import java.util.Map;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,318 +55,319 @@ import com.mongodb.client.model.Filters;
 @ConfigurationProperties(prefix = "mongodb.doc")
 public class DocController {
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
+	Logger log = LoggerFactory.getLogger(this.getClass());
 
-    // @Value("${mongodb.doc.uri:}")
-    private String uri;
+	// @Value("${mongodb.doc.uri:}")
+	private String uri;
 
-    // @Value("${mongodb.doc.database:}")
-    private String database;
+	// @Value("${mongodb.doc.database:}")
+	private String database;
 
-    // @Value("${mongodb.doc.collection:}")
-    private String collection;
+	// @Value("${mongodb.doc.collection:}")
+	private String collection;
+	
+	@Autowired
+	private MongoClient mongoClient;
+	
+	@Autowired
+	private MongoDatabase mongoDatabase;
 
-    public static final String REQUEST_DEVICE_ID = "MBID";
-    public static final String REQUEST_ID = "ID";
+	public static final String REQUEST_DEVICE_ID = "MBID";
+	public static final String REQUEST_ID = "ID";
 
-    public static final String OBJECT_ID = "_id";
-    public static final String DEVICE_ID = "MB";
-    public static final String GOLOBAL_ID = "GID";
-    public static final String UNIVERSAL_ID = "UID";
+	public static final String OBJECT_ID = "_id";
+	public static final String DEVICE_ID = "MB";
+	public static final String GOLOBAL_ID = "GID";
+	public static final String UNIVERSAL_ID = "UID";
 
-    @RequestMapping(value = "/query", method = RequestMethod.POST)
-    public ResponseEntity<?> queryByDevice(@RequestBody Map<String, Object> datas) {
+	@RequestMapping(value = "/query", method = RequestMethod.POST)
+	public ResponseEntity<?> queryByDevice(@RequestBody Map<String, Object> datas) {
 
-        String requestMbId = datas.getOrDefault(REQUEST_DEVICE_ID, "").toString();
-        String requestId = datas.getOrDefault(REQUEST_ID, "").toString();
+		String requestMbId = datas.getOrDefault(REQUEST_DEVICE_ID, "").toString();
+		String requestId = datas.getOrDefault(REQUEST_ID, "").toString();
 
-        log.debug("MBID is : {}, ID is : {}", requestMbId, requestId);
+		log.debug("MBID is : {}, ID is : {}", requestMbId, requestId);
 
-        MongoClientURI mongoClientURI = new MongoClientURI(uri);
+		MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
-        try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
+		// CASE A : 依 Device Id 篩選查找
+		FindIterable<Document> findIterable = mongoCollection
+				.find(Filters.or(Filters.in(DEVICE_ID, requestMbId), Filters.eq(DEVICE_ID, requestMbId))).limit(1);
 
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+		MongoCursor<Document> mongoCursor = findIterable.iterator();
 
-            MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
+		StringBuffer buff = new StringBuffer();
 
-            // CASE A : 依 Device Id 篩選查找
-            FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, requestMbId), Filters.eq(DEVICE_ID, requestMbId))).limit(1);
+		// 篩選條件下的筆數 (須參考 find().limit(1) )
+		int size = 0;
 
-            MongoCursor<Document> mongoCursor = findIterable.iterator();
+		// 需上傳更新回 Mongodb 的
+		List<String> mbList = new LinkedList<String>();
 
-            StringBuffer buff = new StringBuffer();
+		Document findOutDoc = customizeDoc(mongoCursor, size, mbList);
 
-            // 篩選條件下的筆數 (須參考 find().limit(1) )
-            int size = 0;
+		if (findOutDoc == null) {
 
-            // 需上傳更新回 Mongodb 的
-            List<String> mbList = new LinkedList<String>();
+			// CASE C : MBID 查不到 改以 UID 查詢
+			findIterable = mongoCollection.find(Filters.eq(UNIVERSAL_ID, requestId)).limit(1);
 
-            Document findOutDoc = customizeDoc(mongoCursor, size, mbList);
+			mongoCursor = findIterable.iterator();
 
-            if (findOutDoc == null) {
+			findOutDoc = customizeDoc(mongoCursor, size, mbList);
 
-                // CASE C : MBID 查不到 改以 UID 查詢
-                findIterable = mongoCollection.find(Filters.eq(UNIVERSAL_ID, requestId)).limit(1);
+			if (findOutDoc == null) {
 
-                mongoCursor = findIterable.iterator();
+				// 需要新增 Doc
 
-                findOutDoc = customizeDoc(mongoCursor, size, mbList);
+				Document document = new Document(GOLOBAL_ID, getUUID()).append(REQUEST_DEVICE_ID, requestMbId);
 
-                if (findOutDoc == null) {
+				document.remove(OBJECT_ID);
+				buff.append(document.toJson());
 
-                    // 需要新增 Doc
+				mbList.add(requestMbId);
+				document.remove(REQUEST_DEVICE_ID);
+				document.append(DEVICE_ID, mbList);
 
-                    Document document = new Document(GOLOBAL_ID, getUUID()).append(REQUEST_DEVICE_ID, requestMbId);
+				mongoCollection.insertOne(document);
 
-                    document.remove(OBJECT_ID);
-                    buff.append(document.toJson());
+			} else {
 
-                    mbList.add(requestMbId);
-                    document.remove(REQUEST_DEVICE_ID);
-                    document.append(DEVICE_ID, mbList);
+				// CASE B
+				// 依篩選條件更新 Doc
 
-                    mongoCollection.insertOne(document);
+				mbList.add(requestMbId);
+				Document document = new Document(DEVICE_ID, mbList);
+				mongoCollection.updateMany(Filters.eq(UNIVERSAL_ID, requestId), new Document("$set", document));
 
-                } else {
+			}
 
-                    // CASE B
-                    // 依篩選條件更新 Doc
+		} else {
 
-                    mbList.add(requestMbId);
-                    Document document = new Document(DEVICE_ID, mbList);
-                    mongoCollection.updateMany(Filters.eq(UNIVERSAL_ID, requestId), new Document("$set", document));
+			// 依篩選條件更新 Doc
 
-                }
+			Document document = new Document(DEVICE_ID, mbList);
+			if (!requestId.isEmpty()) {
+				document.append(UNIVERSAL_ID, requestId);
+			}
+			mongoCollection.updateMany(
+					Filters.or(Filters.in(DEVICE_ID, requestMbId), Filters.eq(DEVICE_ID, requestMbId)),
+					new Document("$set", document));
 
-            } else {
+		}
 
-                // 依篩選條件更新 Doc
+		if (findOutDoc != null) {
+
+			findOutDoc.put(REQUEST_DEVICE_ID, requestMbId);
 
-                Document document = new Document(DEVICE_ID, mbList);
-                if (!requestId.isEmpty()) {
-                    document.append(UNIVERSAL_ID, requestId);
-                }
-                mongoCollection.updateMany(Filters.or(Filters.in(DEVICE_ID, requestMbId), Filters.eq(DEVICE_ID, requestMbId)), new Document("$set", document));
+			if (buff.length() > 0) {
+				buff.append(",");
+			}
 
-            }
+			// 用他自身的功能轉換成 JSON 格式
+			buff.append(findOutDoc.toJson());
 
-            if (findOutDoc != null) {
-                
-                findOutDoc.put(REQUEST_DEVICE_ID, requestMbId);
+		}
 
-                if (buff.length() > 0) {
-                    buff.append(",");
-                }
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(buff.toString());
+	}
 
-                // 用他自身的功能轉換成 JSON 格式
-                buff.append(findOutDoc.toJson());
-                
-            }
+	private Document customizeDoc(MongoCursor<Document> mongoCursor, int size, List<String> mbList) {
 
-            mongoClient.close();
+		Document doc = null;
 
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(buff.toString());
-        }
+		while (mongoCursor.hasNext()) {
 
-    }
+			// 查出來的 Doc
+			doc = mongoCursor.next();
 
-    private Document customizeDoc(MongoCursor<Document> mongoCursor, int size, List<String> mbList) {
+			size++;
 
-        Document doc = null;
+			doc.put(GOLOBAL_ID, doc.getOrDefault(GOLOBAL_ID, ""));
 
-        while (mongoCursor.hasNext()) {
+			String mb = "";
+			if (doc.containsKey(DEVICE_ID)) {
+				try {
+					mb = doc.getString(DEVICE_ID);
+				} catch (Exception e) {
+					mbList.addAll(doc.getList(DEVICE_ID, String.class));
+					mb = mbList.isEmpty() ? "" : mbList.get(0);
+				}
+			}
 
-            // 查出來的 Doc
-            doc = mongoCursor.next();
+			doc.put(REQUEST_DEVICE_ID, mb);
 
-            size++;
+			// 這邊整理一下要回應的格式，不需要的就移除
+			doc.remove(OBJECT_ID);
+			doc.remove(DEVICE_ID);
+			doc.remove(UNIVERSAL_ID);
 
-            doc.put(GOLOBAL_ID, doc.getOrDefault(GOLOBAL_ID, ""));
+			log.debug("{}", doc);
 
-            String mb = "";
-            if (doc.containsKey(DEVICE_ID)) {
-                try {
-                    mb = doc.getString(DEVICE_ID);
-                } catch (Exception e) {
-                    mbList.addAll(doc.getList(DEVICE_ID, String.class));
-                    mb = mbList.isEmpty() ? "" : mbList.get(0);
-                }
-            }
+			// 僅取一筆
+			break;
 
-            doc.put(REQUEST_DEVICE_ID, mb);
+		}
+		return doc;
+	}
 
-            // 這邊整理一下要回應的格式，不需要的就移除
-            doc.remove(OBJECT_ID);
-            doc.remove(DEVICE_ID);
-            doc.remove(UNIVERSAL_ID);
+	/**
+	 * Get the UUID
+	 * 
+	 * @return
+	 */
+	private Object getUUID() {
+		return "A" + genRandInt(100000000, 999999999) + "B" + genRandInt(100000000, 999999999);
+	}
 
-            log.debug("{}", doc);
+	/**
+	 * Random the min to max number
+	 * 
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public int genRandInt(int min, int max) {
+		SecureRandom rand = getRandom();
+		return rand.nextInt((max - min) + 1) + min;
+	}
 
-            // 僅取一筆
-            break;
+	/**
+	 * Gen Securn random
+	 * 
+	 * @return
+	 */
+	private SecureRandom getRandom() {
+		SecureRandom rand = null;
+		try {
+			rand = SecureRandom.getInstance("SHA1PRNG");
+		} catch (NoSuchAlgorithmException e) {
+			log.error(e.getMessage());
+		}
+		return rand;
+	}
 
-        }
-        return doc;
-    }
+	@RequestMapping(value = "/delAll", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteAll(@RequestBody Map<String, Object> datas) {
 
-    /**
-     * Get the UUID
-     * 
-     * @return
-     */
-    private Object getUUID() {
-        return "A" + genRandInt(100000000, 999999999)+ "B"+ genRandInt(100000000, 999999999);
-    }
+		String requstMbId = datas.getOrDefault(REQUEST_DEVICE_ID, "").toString();
 
-    /**
-     * Random the min to max number
-     * 
-     * @param min
-     * @param max
-     * @return
-     */
-    public int genRandInt(int min, int max) {
-        SecureRandom rand = getRandom();
-        return rand.nextInt((max - min) + 1) + min;
-    }
+		log.debug("MBID is : {}", requstMbId);
 
-    /**
-     * Gen Securn random
-     * 
-     * @return
-     */
-    private SecureRandom getRandom() {
-        SecureRandom rand = null;
-        try {
-            rand = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage());
-        }
-        return rand;
-    }
+		MongoClientURI mongoClientURI = new MongoClientURI(uri);
+		try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
 
-    @RequestMapping(value = "/delAll", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteAll(@RequestBody Map<String, Object> datas) {
+			MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
 
-        String requstMbId = datas.getOrDefault(REQUEST_DEVICE_ID, "").toString();
+			MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
-        log.debug("MBID is : {}", requstMbId);
+			// CASE A : 依 Device Id 篩選查找
+			FindIterable<Document> findIterable = mongoCollection
+					.find(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId))).limit(1);
 
-        MongoClientURI mongoClientURI = new MongoClientURI(uri);
-        try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
+			mongoCollection
+					.deleteMany(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId)));
 
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+			mongoClient.close();
 
-            MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
+			return ResponseEntity.ok().build();
+		}
+	}
 
-            // CASE A : 依 Device Id 篩選查找
-            FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId))).limit(1);
+	@RequestMapping(value = "/all", method = RequestMethod.GET)
+	public ResponseEntity<?> findAll() {
 
-            mongoCollection.deleteMany(Filters.or(Filters.in(DEVICE_ID, requstMbId), Filters.eq(DEVICE_ID, requstMbId)));
+		// try ( MongoClient mongoClient = new MongoClient("localhost", 27017)) {
 
-            mongoClient.close();
+		// MongoCredential credential = MongoCredential.createCredential("poc_mega",
+		// "stage", "hk4g4rufu4".toCharArray());
 
-            return ResponseEntity.ok().build();
-        }
-    }
+		// MongoCredential credential = MongoCredential.createCredential("sk", "admin",
+		// "sk".toCharArray());
+		// try (MongoClient mongoClient = new MongoClient(new ServerAddress("localhost",
+		// 27017), Arrays.asList(credential))) {
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity<?> findAll() {
+		// 準備好 mongodb 連線資訊 uri
+		MongoClientURI mongoClientURI = new MongoClientURI(uri);
 
-        // try ( MongoClient mongoClient = new MongoClient("localhost", 27017)) {
+		try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
 
-        // MongoCredential credential = MongoCredential.createCredential("poc_mega", "stage", "hk4g4rufu4".toCharArray());
+			MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
 
-        // MongoCredential credential = MongoCredential.createCredential("sk", "admin", "sk".toCharArray());
-        // try (MongoClient mongoClient = new MongoClient(new ServerAddress("localhost", 27017), Arrays.asList(credential))) {
+			log.debug("Connect to database successfully");
 
-        // 準備好 mongodb 連線資訊 uri
-        MongoClientURI mongoClientURI = new MongoClientURI(uri);
+			MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
-        try (MongoClient mongoClient = new MongoClient(mongoClientURI)) {
+			// 這邊先查詢出全部
+			FindIterable<Document> findIterable = mongoCollection.find();
 
-            MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+			MongoCursor<Document> mongoCursor = findIterable.iterator();
 
-            log.debug("Connect to database successfully");
+			StringBuffer buff = new StringBuffer();
 
-            MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
+			// 全部輪詢記錄下來
+			while (mongoCursor.hasNext()) {
 
-            // 這邊先查詢出全部
-            FindIterable<Document> findIterable = mongoCollection.find();
+				Document doc = mongoCursor.next();
+				doc.remove(OBJECT_ID);
+				if (buff.length() > 0) {
+					buff.append(",");
+				}
+				// 用他自身的功能轉換成 JSON 格式
+				buff.append(doc.toJson());
+				log.debug("{}", doc);
 
-            MongoCursor<Document> mongoCursor = findIterable.iterator();
+			}
 
-            StringBuffer buff = new StringBuffer();
+			mongoClient.close();
 
-            // 全部輪詢記錄下來
-            while (mongoCursor.hasNext()) {
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(buff.toString());
 
-                Document doc = mongoCursor.next();
-                doc.remove(OBJECT_ID);
-                if (buff.length() > 0) {
-                    buff.append(",");
-                }
-                // 用他自身的功能轉換成 JSON 格式
-                buff.append(doc.toJson());
-                log.debug("{}", doc);
+		} finally {
 
-            }
+		}
 
-            mongoClient.close();
+	}
 
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(buff.toString());
+	/**
+	 * @return the uri
+	 */
+	public String getUri() {
+		return uri;
+	}
 
-        } finally {
+	/**
+	 * @param uri the uri to set
+	 */
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 
-        }
+	/**
+	 * @return the database
+	 */
+	public String getDatabase() {
+		return database;
+	}
 
-    }
+	/**
+	 * @param database the database to set
+	 */
+	public void setDatabase(String database) {
+		this.database = database;
+	}
 
-    /**
-     * @return the uri
-     */
-    public String getUri() {
-        return uri;
-    }
+	/**
+	 * @return the collection
+	 */
+	public String getCollection() {
+		return collection;
+	}
 
-    /**
-     * @param uri
-     *            the uri to set
-     */
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    /**
-     * @return the database
-     */
-    public String getDatabase() {
-        return database;
-    }
-
-    /**
-     * @param database
-     *            the database to set
-     */
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    /**
-     * @return the collection
-     */
-    public String getCollection() {
-        return collection;
-    }
-
-    /**
-     * @param collection
-     *            the collection to set
-     */
-    public void setCollection(String collection) {
-        this.collection = collection;
-    }
+	/**
+	 * @param collection the collection to set
+	 */
+	public void setCollection(String collection) {
+		this.collection = collection;
+	}
 
 }
