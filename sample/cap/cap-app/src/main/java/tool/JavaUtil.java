@@ -2,6 +2,8 @@ package tool;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -45,24 +47,23 @@ public class JavaUtil {
         System.out.printf("\tJavaUtil.getJavaUUID() \t\t= %s\n", JavaUtil.getJavaUUID());
         System.out.printf("\tJavaUtil.getJavaUUID(%d) \t= %s\n", 20, JavaUtil.getJavaUUID(20));
         System.out.printf("\tJavaUtil.getUUID() \t\t= %s\n", JavaUtil.getUUID());
-        System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new MongoBean().mongoDatabase().getCollection("myCol") , "D1", ""));
+        System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new MongoBean().mongoDatabase().getCollection("myCol"), "D1", ""));
     }
 
     public static final String REQUEST_DEVICE_ID = MongoBean.DocEnum.REQUEST_DEVICE_ID.getCode();
-    
+
     public static final String REQUEST_ID = MongoBean.DocEnum.REQUEST_ID.getCode();
 
     public static final String OBJECT_ID = MongoBean.DocEnum.OBJECT_ID.getCode();
 
     /** channel id */
     public static final String DEVICE_ID = MongoBean.DocEnum.DEVICE_ID.getCode();
-    
+
     /** 全通路識別碼 */
     public static final String UID = MongoBean.DocEnum.UID.getCode();
-    
+
     /** 客戶 ID */
     public static final String ID = MongoBean.DocEnum.ID.getCode();
-
 
     /**
      * 全通路處理邏輯
@@ -78,86 +79,103 @@ public class JavaUtil {
      */
     public static String queryByDeviceAndId(MongoCollection<Document> mongoCollection, String deviceId, String id) throws Exception {
 
-        System.out.printf("DEVICE ID => %s, ID => %s\n", deviceId, id);
-        
         // FIXMEd 取得 mongoCollection 物件
         if (mongoCollection == null) {
             return null;
         }
-        
-        if ((deviceId == null || deviceId.length() == 0) && (id == null || id.length() == 0)) {
+
+        if (isEmpty(deviceId) && isEmpty(id)) {
             return null;
         }
-        
+
+        if (deviceId != null) {
+            deviceId = trim(deviceId);
+        } else {
+            deviceId = "";
+        }
+
+        if (id != null) {
+            id = trim(id);
+        } else {
+            id = "";
+        }
+
+        System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
+
         String result = "";
 
-        // CASE A : 依 Device Id 篩選查找
-        FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId))).limit(1);
+        // 用 DeviceID=XXXX or ID=XXXX 查詢 Mongo
+        FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
 
         MongoCursor<Document> mongoCursor = findIterable.iterator();
-
-        // 篩選條件下的筆數 (須參考 find().limit(1) )
-        int size = 0;
 
         // 需上傳更新回 Mongodb 的
         List<String> channelList = new LinkedList<String>();
 
-        Document findOutDoc = customizeDoc(mongoCursor, size, channelList);
+        List<Document> resultList = customizeDoc(mongoCursor, channelList);
 
-        if (findOutDoc == null) {
+        // A. 查無資料時
+        if (isEmpty(resultList)) {
 
-            // CASE C : DEVICE ID 查不到 改以 ID 查詢
-            findIterable = mongoCollection.find(Filters.eq(ID, id)).limit(1);
+            // 需要新增 Mongo 物件
 
-            mongoCursor = findIterable.iterator();
+            Document document = new Document(UID, getUUID()).append(REQUEST_DEVICE_ID, deviceId);
 
-            findOutDoc = customizeDoc(mongoCursor, size, channelList);
+            // 並回傳 UID
+            result = trim(document.getString(UID));
 
-            if (findOutDoc == null) {
+            channelList.add(deviceId);
 
-                // 需要新增 Doc
+            document.append(DEVICE_ID, channelList);
 
-                Document document = new Document(UID, getUUID()).append(REQUEST_DEVICE_ID, deviceId);
+            mongoCollection.insertOne(document);
 
-                document.remove(OBJECT_ID);
-                
-                result = document.getString(UID);
+        } else if (resultList.size() == 1) {
+            // B. 查到一筆
+            // 若 DeviceID or UID 有缺，會更新
+            // 若 UID 跟輸入資料不一致，新增一個
 
-                channelList.add(deviceId);
-                document.remove(REQUEST_DEVICE_ID);
-                document.append(DEVICE_ID, channelList);
+            Document findDocument = resultList.get(0);
+            if (findDocument != null) {
+                result = trim(findDocument.getString(UID));
+            }
 
+            channelList.add(deviceId);
+            Document document = new Document(DEVICE_ID, channelList);
+            document.append(ID, id);
+
+            if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
                 mongoCollection.insertOne(document);
-
             } else {
-
-                // CASE B
-                // 依篩選條件更新 Doc
-
-                channelList.add(deviceId);
-                Document document = new Document(DEVICE_ID, channelList);
-                mongoCollection.updateMany(Filters.eq(ID, id), new Document("$set", document));
-
+                mongoCollection.updateOne(Filters.eq(ID, id), new Document("$set", document));
             }
 
         } else {
-
-            // 依篩選條件更新 Doc
+            // C. 查到多筆
+            // 以有 ID 的那一筆資料為主 DeviceID or UID 有缺，會更新
+            // 若 UID 跟輸入資料不一致， 新增一個
 
             Document document = new Document(DEVICE_ID, channelList);
-            if (!(id == null || id.isEmpty()) ) {
+            if (!(isEmpty(id))) {
                 document.append(ID, id);
             }
             mongoCollection.updateMany(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
 
         }
-        
-        // FIXME 待測試
-        if (findOutDoc != null) {
-            result = findOutDoc.getString(UID);
-        }
 
         return result;
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.length() == 0;
+    }
+
+    public static String trim(String str) {
+        return str == null ? null : str.trim();
+    }
+
+    public static boolean isEmpty(Collection<?> collection) {
+        return (collection == null || collection.isEmpty());
     }
 
     /**
@@ -168,7 +186,9 @@ public class JavaUtil {
      * @param channelList
      * @return Document
      */
-    private static Document customizeDoc(MongoCursor<Document> mongoCursor, int size, List<String> channelList) {
+    private static List<Document> customizeDoc(MongoCursor<Document> mongoCursor, List<String> channelList) {
+
+        List<Document> resultList = new ArrayList<Document>();
 
         Document doc = null;
 
@@ -176,8 +196,6 @@ public class JavaUtil {
 
             // 查出來的 Doc
             doc = mongoCursor.next();
-
-            size++;
 
             doc.put(UID, doc.getOrDefault(UID, ""));
 
@@ -187,7 +205,7 @@ public class JavaUtil {
                     mb = doc.getString(DEVICE_ID);
                 } catch (Exception e) {
                     channelList.addAll(doc.getList(DEVICE_ID, String.class));
-                    mb = channelList.isEmpty() ? "" : channelList.get(0);
+                    mb = isEmpty(channelList) ? "" : channelList.get(0);
                 }
             }
 
@@ -195,16 +213,13 @@ public class JavaUtil {
 
             // 這邊整理一下要回應的格式，不需要的就移除
             doc.remove(OBJECT_ID);
-            doc.remove(DEVICE_ID);
-            doc.remove(ID);
 
             System.out.printf("%s", doc);
 
-            // 僅取一筆
-            break;
-
+            resultList.add(doc);
         }
-        return doc;
+
+        return resultList;
     }
 
     /**

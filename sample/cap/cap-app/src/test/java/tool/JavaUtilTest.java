@@ -11,10 +11,10 @@
  */
 package tool;
 
-import static org.junit.Assert.assertNotNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 /**
@@ -37,22 +37,27 @@ public class JavaUtilTest {
         MongoBean bean = new MongoBean();
         MongoDatabase mongoDatabase = bean.mongoDatabase();
         String collection = bean.getCollection();
+        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
         try {
 
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D1", null));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D1", "A123"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D2", ""));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "", "A456"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D2", "A456"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D3", "A789"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D3", "A246"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D4", ""));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", ""));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D4", "A135"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A135"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A222"));
-            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A444"));
+            JavaUtil javaUtil = new JavaUtil();
+
+            Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(null, null, null));
+            Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D2", ""));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "", "A456"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D2", "A456"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A789"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A246"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D4", ""));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", ""));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D4", "A135"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A135"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
+            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
         } catch (Exception e) {
             // TODO Auto-generated catch block

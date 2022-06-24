@@ -57,7 +57,7 @@ public class MongoBean {
     enum DocEnum {
 
         /** DeviceId */
-        REQUEST_DEVICE_ID("DeviceID"),
+        REQUEST_DEVICE_ID("DeviceId"),
         /** ID */
         REQUEST_ID("ID"),
         /** _id */
