@@ -134,9 +134,7 @@ public class JavaUtil {
 
             // 需要新增 Mongo 物件
 
-            channelList.add(deviceId);
-
-            toApplyDocument = updateDocContent(deviceId, id, channelList, (String) getUUID());
+            toApplyDocument = updateDocContent((String) getUUID(), id, deviceId, channelList);
 
         } else if (resultList.size() == 1) {
             // B. 查到一筆
@@ -144,8 +142,9 @@ public class JavaUtil {
             // 若 UID 跟輸入資料不一致，新增一個
 
             findDocument = resultList.get(0);
+            channelList = findDocument.getList(DEVICE_ID, String.class);
 
-            toApplyDocument = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
+            toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, channelList);
 
         } else {
             // C. 查到多筆
@@ -161,7 +160,9 @@ public class JavaUtil {
                 }
             }
 
-            toApplyDocument = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
+            channelList = findDocument.getList(DEVICE_ID, String.class);
+
+            toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, channelList);
 
         }
 
@@ -184,14 +185,21 @@ public class JavaUtil {
         return null;
     }
 
-    private static Document updateDocContent(String deviceId, String id, List<String> channelList, String UID) {
+    private static Document updateDocContent(String uid, String id, String deviceId, List<String> channelList) {
 
-        channelList.add(deviceId);
+        if (!channelList.contains(deviceId)) {
+            channelList.add(deviceId);
+        }
 
         Document document = new Document(DEVICE_ID, channelList);
         if (!(isEmpty(id))) {
             document.append(ID, id);
         }
+
+        if (!(isEmpty(UID))) {
+            document.append(UID, uid);
+        }
+
         return document;
     }
 
