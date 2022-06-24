@@ -11,6 +11,10 @@
  */
 package tool;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,22 +47,28 @@ public class JavaUtilTest {
 
             JavaUtil javaUtil = new JavaUtil();
 
+            IntStream.range(0, 0);
+            
+            
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoDatabase, null, null));
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D2", ""));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "", "A456"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D2", "A456"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A789"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A246"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D4", ""));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", ""));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D4", "A135"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A135"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
-            Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
+            
+            List<String> result = new ArrayList<String>();
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D2", ""));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "", "A456"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D2", "A456"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A789"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D3", "A246"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D4", ""));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", ""));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D4", "A135"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A135"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
+            result.stream().forEach(r-> System.out.println(r));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
