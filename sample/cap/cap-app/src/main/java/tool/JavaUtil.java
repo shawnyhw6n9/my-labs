@@ -125,8 +125,10 @@ public class JavaUtil {
 
         List<String> channelList = new LinkedList<String>();
 
-        Document document = null; 
-                
+        Document findDocument = null;
+
+        Document toApplyDocument = null;
+
         // A. 查無資料時
         if (isEmpty(resultList)) {
 
@@ -134,32 +136,24 @@ public class JavaUtil {
 
             channelList.add(deviceId);
 
-            updateDocContent(deviceId, id, channelList, (String) getUUID());
-
-            mongoCollection.insertOne(document);
+            toApplyDocument = updateDocContent(deviceId, id, channelList, (String) getUUID());
 
         } else if (resultList.size() == 1) {
             // B. 查到一筆
             // 若 DeviceID or UID 有缺，會更新
             // 若 UID 跟輸入資料不一致，新增一個
 
-            Document findDocument = resultList.get(0);
+            findDocument = resultList.get(0);
 
-            document = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
-
-            if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
-                mongoCollection.insertOne(document);
-            } else {
-                mongoCollection.updateOne(Filters.eq(ID, id), new Document("$set", document));
-            }
+            toApplyDocument = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
 
         } else {
             // C. 查到多筆
             // 以有 ID 的那一筆資料為主 DeviceID or UID 有缺，會更新
             // 若 UID 跟輸入資料不一致， 新增一個
 
-            Document findDocument = null;
-            
+            findDocument = null;
+
             for (Document doc : resultList) {
                 if (doc.containsKey(ID) && !isEmpty(doc.getString(ID))) {
                     findDocument = doc;
@@ -167,21 +161,26 @@ public class JavaUtil {
                 }
             }
 
-            document = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
+            toApplyDocument = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
 
-            if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
-                mongoCollection.insertOne(document);
+        }
+
+        if (toApplyDocument != null) {
+
+            if (findDocument == null) {
+                mongoCollection.insertOne(toApplyDocument);
             } else {
-                mongoCollection.updateOne(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
+                if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
+                    mongoCollection.insertOne(toApplyDocument);
+                } else {
+                    mongoCollection.updateOne(Filters.eq(UID, toApplyDocument.getString(UID)), new Document("$set", toApplyDocument));
+                }
             }
 
+            // 並回傳 UID
+            return trim(toApplyDocument.getString(UID));
         }
 
-        if (document != null) {
-            // 並回傳 UID
-            return trim(document.getString(UID));
-        }
-        
         return null;
     }
 
