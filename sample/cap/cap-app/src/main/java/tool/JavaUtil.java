@@ -7,15 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.springframework.context.annotation.Bean;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -50,52 +45,30 @@ public class JavaUtil {
         System.out.printf("\tJavaUtil.getJavaUUID() \t\t= %s\n", JavaUtil.getJavaUUID());
         System.out.printf("\tJavaUtil.getJavaUUID(%d) \t= %s\n", 20, JavaUtil.getJavaUUID(20));
         System.out.printf("\tJavaUtil.getUUID() \t\t= %s\n", JavaUtil.getUUID());
-        System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new JavaUtil().mongoDatabase() , "D1", ""));
-    }
-    
-    public MongoClient mongoClient() {
-        MongoClientURI mongoClientURI = new MongoClientURI(uri);
-        MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
-        builder.connectionsPerHost(3000);
-
-        MongoClientOptions mongoClientOptions = builder.build();
-
-        MongoClient mongoClient = new MongoClient(mongoClientURI);
-        return mongoClient;
+        System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new MongoBean().mongoDatabase().getCollection("myCol") , "D1", ""));
     }
 
-    public MongoDatabase mongoDatabase() {
-        MongoDatabase mongoDatabase = mongoClient().getDatabase(database);
-        return mongoDatabase;
-    }
-
-    // TODO 應該由外部帶入
-    private static String collection = "myCol";
-
-    private String uri = "mongodb://sk:sk@localhost:27017";
+    public static final String REQUEST_DEVICE_ID = MongoBean.DocEnum.REQUEST_DEVICE_ID.getCode();
     
-    private String database = "test";
+    public static final String REQUEST_ID = MongoBean.DocEnum.REQUEST_ID.getCode();
 
-    public static final String REQUEST_DEVICE_ID = "DeviceID";
-    
-    public static final String REQUEST_ID = "ID";
-
-    public static final String OBJECT_ID = "_id";
+    public static final String OBJECT_ID = MongoBean.DocEnum.OBJECT_ID.getCode();
 
     /** channel id */
-    public static final String DEVICE_ID = "DeviceId";
+    public static final String DEVICE_ID = MongoBean.DocEnum.DEVICE_ID.getCode();
     
     /** 全通路識別碼 */
-    public static final String UID = "UID";
+    public static final String UID = MongoBean.DocEnum.UID.getCode();
     
     /** 客戶 ID */
-    public static final String ID = "ID";
+    public static final String ID = MongoBean.DocEnum.ID.getCode();
+
 
     /**
      * 全通路處理邏輯
      * 
-     * @param mongoDatabase
-     *            MongoDatabase
+     * @param mongoCollection
+     *            MongoCollection<Document>
      * @param deviceId
      *            String
      * @param id
@@ -103,18 +76,20 @@ public class JavaUtil {
      * @return globalId String
      * @throws NoSuchAlgorithmException
      */
-    public static String queryByDeviceAndId(MongoDatabase mongoDatabase, String deviceId, String id) throws Exception {
+    public static String queryByDeviceAndId(MongoCollection<Document> mongoCollection, String deviceId, String id) throws Exception {
 
-        // FIXME 取得 mongoDatabase 物件
-        if (mongoDatabase == null) {
+        System.out.printf("DEVICE ID => %s, ID => %s\n", deviceId, id);
+        
+        // FIXMEd 取得 mongoCollection 物件
+        if (mongoCollection == null) {
             return null;
         }
         
-        System.out.printf("DEVICE ID => %s, ID => %s\n", deviceId, id);
+        if ((deviceId == null || deviceId.length() == 0) && (id == null || id.length() == 0)) {
+            return null;
+        }
         
         String result = "";
-
-        MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
         // CASE A : 依 Device Id 篩選查找
         FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId))).limit(1);
@@ -170,7 +145,7 @@ public class JavaUtil {
             // 依篩選條件更新 Doc
 
             Document document = new Document(DEVICE_ID, channelList);
-            if (!id.isEmpty()) {
+            if (!(id == null || id.isEmpty()) ) {
                 document.append(ID, id);
             }
             mongoCollection.updateMany(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
