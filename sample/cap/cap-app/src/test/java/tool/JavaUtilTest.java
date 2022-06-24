@@ -43,7 +43,7 @@ public class JavaUtilTest {
 
             JavaUtil javaUtil = new JavaUtil();
 
-            Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(null, null, null));
+            Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoDatabase, null, null));
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
             Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
             Assert.assertNotNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));

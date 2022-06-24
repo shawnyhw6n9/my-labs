@@ -13,6 +13,7 @@ import org.bson.Document;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -71,6 +72,25 @@ public class JavaUtil {
     /**
      * 全通路處理邏輯
      * 
+     * @param mongoDatabase
+     *            MongoDatabase
+     * @param deviceId
+     *            String
+     * @param id
+     *            String
+     * @return globalId (UID) String
+     * @throws Exception
+     */
+    public static String queryByDeviceAndId(MongoDatabase mongoDatabase, String deviceId, String id) throws Exception {
+        if (mongoDatabase == null) {
+            return null;
+        }
+        return queryByDeviceAndId(mongoDatabase.getCollection(new MongoBean().getCollection()), deviceId, id);
+    }
+
+    /**
+     * 全通路處理邏輯
+     * 
      * @param mongoCollection
      *            MongoCollection<Document>
      * @param deviceId
@@ -78,7 +98,7 @@ public class JavaUtil {
      * @param id
      *            String
      * @return globalId String
-     * @throws NoSuchAlgorithmException
+     * @throws Exception
      */
     public static String queryByDeviceAndId(MongoCollection<Document> mongoCollection, String deviceId, String id) throws Exception {
 
@@ -96,8 +116,6 @@ public class JavaUtil {
 
         System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
 
-        String result = "";
-
         // 用 DeviceID=XXXX or ID=XXXX 查詢 Mongo
         FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
 
@@ -106,7 +124,9 @@ public class JavaUtil {
         List<Document> resultList = customizeDoc(mongoCursor);
 
         List<String> channelList = new LinkedList<String>();
-        
+
+        Document document = null; 
+                
         // A. 查無資料時
         if (isEmpty(resultList)) {
 
@@ -114,16 +134,9 @@ public class JavaUtil {
 
             channelList.add(deviceId);
 
-            Document document = extracted(deviceId, id, channelList);
-            
-            document.append(UID, getUUID());
-            
+            updateDocContent(deviceId, id, channelList, (String) getUUID());
+
             mongoCollection.insertOne(document);
-            
-            if (document != null) {
-                // 並回傳 UID
-                result = trim(document.getString(UID));
-            }
 
         } else if (resultList.size() == 1) {
             // B. 查到一筆
@@ -132,17 +145,12 @@ public class JavaUtil {
 
             Document findDocument = resultList.get(0);
 
-            
-            Document document = extracted(deviceId, id, channelList);
-            
+            document = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
+
             if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
                 mongoCollection.insertOne(document);
             } else {
                 mongoCollection.updateOne(Filters.eq(ID, id), new Document("$set", document));
-            }
-            
-            if (document != null) {
-                result = trim(document.getString(UID));
             }
 
         } else {
@@ -151,14 +159,15 @@ public class JavaUtil {
             // 若 UID 跟輸入資料不一致， 新增一個
 
             Document findDocument = null;
-            for (Document doc : resultList) {
-                if (!doc.containsKey(ID)) {
-                    continue;
-                }
-                findDocument = doc;
-            }
             
-            Document document = extracted(deviceId, id, channelList);
+            for (Document doc : resultList) {
+                if (doc.containsKey(ID) && !isEmpty(doc.getString(ID))) {
+                    findDocument = doc;
+                    break;
+                }
+            }
+
+            document = updateDocContent(deviceId, id, channelList, findDocument.getString(UID));
 
             if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
                 mongoCollection.insertOne(document);
@@ -166,19 +175,20 @@ public class JavaUtil {
                 mongoCollection.updateOne(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
             }
 
-            if (document != null) {
-                result = trim(document.getString(UID));
-            }
-            
         }
 
-        return result;
+        if (document != null) {
+            // 並回傳 UID
+            return trim(document.getString(UID));
+        }
+        
+        return null;
     }
 
-    private static Document extracted(String deviceId, String id, List<String> channelList) {
-        
+    private static Document updateDocContent(String deviceId, String id, List<String> channelList, String UID) {
+
         channelList.add(deviceId);
-        
+
         Document document = new Document(DEVICE_ID, channelList);
         if (!(isEmpty(id))) {
             document.append(ID, id);
@@ -195,7 +205,7 @@ public class JavaUtil {
     }
 
     public static String trimNull(String str) {
-        return str == null ? null : "";
+        return str == null ? "" : trim(str);
     }
 
     public static boolean isEmpty(Collection<?> collection) {
