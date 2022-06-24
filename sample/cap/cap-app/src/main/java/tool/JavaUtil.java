@@ -50,19 +50,22 @@ public class JavaUtil {
         System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new MongoBean().mongoDatabase().getCollection("myCol"), "D1", ""));
     }
 
+    /** DeviceId */
     public static final String REQUEST_DEVICE_ID = MongoBean.DocEnum.REQUEST_DEVICE_ID.getCode();
 
+    /** ID */
     public static final String REQUEST_ID = MongoBean.DocEnum.REQUEST_ID.getCode();
 
+    /** _id */
     public static final String OBJECT_ID = MongoBean.DocEnum.OBJECT_ID.getCode();
 
-    /** channel id */
+    /** channel id (DeviceId) */
     public static final String DEVICE_ID = MongoBean.DocEnum.DEVICE_ID.getCode();
 
-    /** 全通路識別碼 */
+    /** 全通路識別碼 (UID) */
     public static final String UID = MongoBean.DocEnum.UID.getCode();
 
-    /** 客戶 ID */
+    /** 客戶 ID (ID) */
     public static final String ID = MongoBean.DocEnum.ID.getCode();
 
     /**
@@ -88,17 +91,8 @@ public class JavaUtil {
             return null;
         }
 
-        if (deviceId != null) {
-            deviceId = trim(deviceId);
-        } else {
-            deviceId = "";
-        }
-
-        if (id != null) {
-            id = trim(id);
-        } else {
-            id = "";
-        }
+        deviceId = trimNull(deviceId);
+        id = trimNull(id);
 
         System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
 
@@ -109,26 +103,27 @@ public class JavaUtil {
 
         MongoCursor<Document> mongoCursor = findIterable.iterator();
 
-        // 需上傳更新回 Mongodb 的
+        List<Document> resultList = customizeDoc(mongoCursor);
+
         List<String> channelList = new LinkedList<String>();
-
-        List<Document> resultList = customizeDoc(mongoCursor, channelList);
-
+        
         // A. 查無資料時
         if (isEmpty(resultList)) {
 
             // 需要新增 Mongo 物件
 
-            Document document = new Document(UID, getUUID()).append(REQUEST_DEVICE_ID, deviceId);
-
-            // 並回傳 UID
-            result = trim(document.getString(UID));
-
             channelList.add(deviceId);
 
-            document.append(DEVICE_ID, channelList);
-
+            Document document = extracted(deviceId, id, channelList);
+            
+            document.append(UID, getUUID());
+            
             mongoCollection.insertOne(document);
+            
+            if (document != null) {
+                // 並回傳 UID
+                result = trim(document.getString(UID));
+            }
 
         } else if (resultList.size() == 1) {
             // B. 查到一筆
@@ -136,18 +131,18 @@ public class JavaUtil {
             // 若 UID 跟輸入資料不一致，新增一個
 
             Document findDocument = resultList.get(0);
-            if (findDocument != null) {
-                result = trim(findDocument.getString(UID));
-            }
 
-            channelList.add(deviceId);
-            Document document = new Document(DEVICE_ID, channelList);
-            document.append(ID, id);
-
+            
+            Document document = extracted(deviceId, id, channelList);
+            
             if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
                 mongoCollection.insertOne(document);
             } else {
                 mongoCollection.updateOne(Filters.eq(ID, id), new Document("$set", document));
+            }
+            
+            if (document != null) {
+                result = trim(document.getString(UID));
             }
 
         } else {
@@ -155,15 +150,40 @@ public class JavaUtil {
             // 以有 ID 的那一筆資料為主 DeviceID or UID 有缺，會更新
             // 若 UID 跟輸入資料不一致， 新增一個
 
-            Document document = new Document(DEVICE_ID, channelList);
-            if (!(isEmpty(id))) {
-                document.append(ID, id);
+            Document findDocument = null;
+            for (Document doc : resultList) {
+                if (!doc.containsKey(ID)) {
+                    continue;
+                }
+                findDocument = doc;
             }
-            mongoCollection.updateMany(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
+            
+            Document document = extracted(deviceId, id, channelList);
 
+            if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
+                mongoCollection.insertOne(document);
+            } else {
+                mongoCollection.updateOne(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId)), new Document("$set", document));
+            }
+
+            if (document != null) {
+                result = trim(document.getString(UID));
+            }
+            
         }
 
         return result;
+    }
+
+    private static Document extracted(String deviceId, String id, List<String> channelList) {
+        
+        channelList.add(deviceId);
+        
+        Document document = new Document(DEVICE_ID, channelList);
+        if (!(isEmpty(id))) {
+            document.append(ID, id);
+        }
+        return document;
     }
 
     public static boolean isEmpty(String str) {
@@ -172,6 +192,10 @@ public class JavaUtil {
 
     public static String trim(String str) {
         return str == null ? null : str.trim();
+    }
+
+    public static String trimNull(String str) {
+        return str == null ? null : "";
     }
 
     public static boolean isEmpty(Collection<?> collection) {
@@ -186,7 +210,7 @@ public class JavaUtil {
      * @param channelList
      * @return Document
      */
-    private static List<Document> customizeDoc(MongoCursor<Document> mongoCursor, List<String> channelList) {
+    private static List<Document> customizeDoc(MongoCursor<Document> mongoCursor) {
 
         List<Document> resultList = new ArrayList<Document>();
 
@@ -199,17 +223,17 @@ public class JavaUtil {
 
             doc.put(UID, doc.getOrDefault(UID, ""));
 
-            String mb = "";
+            // 需上傳更新回 Mongodb 的
+            List<String> channelList = new LinkedList<String>();
+
             if (doc.containsKey(DEVICE_ID)) {
                 try {
-                    mb = doc.getString(DEVICE_ID);
+                    channelList.add(doc.getString(DEVICE_ID));
                 } catch (Exception e) {
                     channelList.addAll(doc.getList(DEVICE_ID, String.class));
-                    mb = isEmpty(channelList) ? "" : channelList.get(0);
                 }
+                doc.append(DEVICE_ID, channelList);
             }
-
-            doc.put(REQUEST_DEVICE_ID, mb);
 
             // 這邊整理一下要回應的格式，不需要的就移除
             doc.remove(OBJECT_ID);
