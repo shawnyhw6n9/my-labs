@@ -38,6 +38,8 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
+import tool.JavaUtil;
+
 /**
  * <pre>
  * Controller for document that in Mongodb
@@ -72,13 +74,13 @@ public class DocController {
 	@Autowired
 	private MongoDatabase mongoDatabase;
 
-	public static final String REQUEST_DEVICE_ID = "MBID";
+	public static final String REQUEST_DEVICE_ID = "DeviceID";
 	public static final String REQUEST_ID = "ID";
 
 	public static final String OBJECT_ID = "_id";
-	public static final String DEVICE_ID = "MB";
-	public static final String GOLOBAL_ID = "GID";
-	public static final String UNIVERSAL_ID = "UID";
+	public static final String DEVICE_ID = "DeviceId";
+	public static final String GOLOBAL_ID = "UID";
+	public static final String UNIVERSAL_ID = "ID";
 
 	@RequestMapping(value = "/query", method = RequestMethod.POST)
 	public ResponseEntity<?> queryByDevice(@RequestBody Map<String, Object> datas) {
@@ -216,7 +218,7 @@ public class DocController {
 	 * @return
 	 */
 	private Object getUUID() {
-		return "A" + genRandInt(100000000, 999999999) + "B" + genRandInt(100000000, 999999999);
+		return JavaUtil.getJavaUUID(20);
 	}
 
 	/**
