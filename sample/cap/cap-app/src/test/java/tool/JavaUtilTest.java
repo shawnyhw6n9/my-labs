@@ -37,17 +37,28 @@ public class JavaUtilTest {
         MongoBean bean = new MongoBean();
         MongoDatabase mongoDatabase = bean.mongoDatabase();
         String collection = bean.getCollection();
-        
-        String result = null;
+
         try {
-            result = new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D1", null);
-            System.out.printf("RESULT => %s", result);
+
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D1", null));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D1", "A123"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D2", ""));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "", "A456"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D2", "A456"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D3", "A789"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D3", "A246"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D4", ""));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", ""));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D4", "A135"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A135"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A222"));
+            assertNotNull("RESULT => %s", new JavaUtil().queryByDeviceAndId(mongoDatabase.getCollection(collection), "D5", "A444"));
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        assertNotNull(result);
     }
 
 }
