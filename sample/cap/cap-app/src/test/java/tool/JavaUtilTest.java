@@ -95,7 +95,8 @@ public class JavaUtilTest {
 
         mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), 
                 Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"),
-                Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5")));
+                Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5"),
+                Filters.in("Id", "A456")));
 
         mongoClient.close();
     }

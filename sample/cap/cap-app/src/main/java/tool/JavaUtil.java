@@ -153,36 +153,55 @@ public class JavaUtil {
 
             isNewOne = !isEmpty(findDocument.getString(ID)) && !id.equalsIgnoreCase(trim(findDocument.getString(ID)));
 
+            if (isNewOne) {
+                toApplyDocument.put(UID, getUUID());
+            }
         } else {
             // C. 查到多筆
             // 以有 ID 的那一筆資料為主 DeviceID or UID 有缺，會更新
             // 若 UID 跟輸入資料不一致， 新增一個
 
             findDocument = null;
+            // FIXME
+            // Document case5Document = null;
+            Document case12Document = null;
 
             for (Document doc : resultList) {
 
-                // 沒有 device id ex: case 5
-                if (!doc.containsKey(DEVICE_ID) && !isEmpty(doc.getString(ID))) {
+                if (id.equalsIgnoreCase(trim(doc.getString(ID)))) {
                     findDocument = doc;
-                    isNewOne = false;
+                    case12Document = null;
                     break;
                 }
+
+                // FIXME
+                // 沒有 device id ex: case 5
+                // if (!doc.containsKey(DEVICE_ID) && !isEmpty(doc.getString(ID))) {
+                // case5Document = doc;
+                // }
 
                 // choose empty id and update it. ex: case 12
                 if (isEmpty(doc.getString(ID))) {
-                    findDocument = doc;
-                    isNewOne = true;
-                    break;
+                    case12Document = doc;
                 }
-
-                findDocument = doc;
-
-                // 有 id 的都要看，不一致要新增
-                isNewOne = !id.equalsIgnoreCase(trim(doc.getString(ID)));
-
+                
             }
 
+            if (findDocument == null) {
+                findDocument = case12Document;
+                // Case 13
+                if (case12Document == null) {
+                    findDocument = updateDocContent((String) getUUID(), "", "", channelList);
+                }
+            }
+
+            // 有 id 的都要看，不一致要新增
+            isNewOne = !id.equalsIgnoreCase(trim(findDocument.getString(ID)));
+
+            if (case12Document != null) {
+                isNewOne = false;
+            }
+            
             if (findDocument != null) {
                 channelList = findDocument.getList(DEVICE_ID, String.class);
             }
