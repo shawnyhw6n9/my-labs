@@ -18,8 +18,10 @@ import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 /**
  * <pre>
@@ -39,8 +41,11 @@ public class JavaUtilTest {
     public void test() {
 
         MongoBean bean = new MongoBean();
-        MongoDatabase mongoDatabase = bean.mongoDatabase();
+        bean.setUri("mongodb://localhost:27017");
         String collection = bean.getCollection();
+        String database = bean.getDatabase();
+        MongoClient mongoClient = bean.mongoClient();
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
         try {
@@ -48,11 +53,10 @@ public class JavaUtilTest {
             JavaUtil javaUtil = new JavaUtil();
 
             IntStream.range(0, 0);
-            
-            
+
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoDatabase, null, null));
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
-            
+
             List<String> result = new ArrayList<String>();
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
@@ -68,12 +72,32 @@ public class JavaUtilTest {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
-            result.stream().forEach(r-> System.out.println(r));
+            mongoClient.close();
+
+            result.stream().forEach(r -> System.out.println(r));
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    public void delAll() {
+        MongoBean bean = new MongoBean();
+        bean.setUri("mongodb://localhost:27017");
+        String collection = bean.getCollection();
+        String database = bean.getDatabase();
+        MongoClient mongoClient = bean.mongoClient();
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+
+        mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), 
+                Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"),
+                Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5")));
+
+        mongoClient.close();
     }
 
 }

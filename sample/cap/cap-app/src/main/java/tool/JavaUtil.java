@@ -10,6 +10,9 @@ import java.util.UUID;
 
 import org.bson.Document;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -129,6 +132,8 @@ public class JavaUtil {
 
         Document toApplyDocument = null;
 
+        boolean isNewOne = false;
+
         // A. 查無資料時
         if (isEmpty(resultList)) {
 
@@ -146,6 +151,8 @@ public class JavaUtil {
 
             toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, channelList);
 
+            isNewOne = !isEmpty(findDocument.getString(ID)) && !id.equalsIgnoreCase(trim(findDocument.getString(ID)));
+
         } else {
             // C. 查到多筆
             // 以有 ID 的那一筆資料為主 DeviceID or UID 有缺，會更新
@@ -154,13 +161,31 @@ public class JavaUtil {
             findDocument = null;
 
             for (Document doc : resultList) {
-                if (doc.containsKey(ID) && !isEmpty(doc.getString(ID))) {
+
+                // 沒有 device id ex: case 5
+                if (!doc.containsKey(DEVICE_ID) && !isEmpty(doc.getString(ID))) {
                     findDocument = doc;
+                    isNewOne = false;
                     break;
                 }
+
+                // choose empty id and update it. ex: case 12
+                if (isEmpty(doc.getString(ID))) {
+                    findDocument = doc;
+                    isNewOne = true;
+                    break;
+                }
+
+                findDocument = doc;
+
+                // 有 id 的都要看，不一致要新增
+                isNewOne = !id.equalsIgnoreCase(trim(doc.getString(ID)));
+
             }
 
-            channelList = findDocument.getList(DEVICE_ID, String.class);
+            if (findDocument != null) {
+                channelList = findDocument.getList(DEVICE_ID, String.class);
+            }
 
             toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, channelList);
 
@@ -171,7 +196,7 @@ public class JavaUtil {
             if (findDocument == null) {
                 mongoCollection.insertOne(toApplyDocument);
             } else {
-                if (!id.equalsIgnoreCase(trim(findDocument.getString(ID)))) {
+                if (isNewOne) {
                     mongoCollection.insertOne(toApplyDocument);
                 } else {
                     mongoCollection.updateOne(Filters.eq(UID, toApplyDocument.getString(UID)), new Document("$set", toApplyDocument));
@@ -185,9 +210,18 @@ public class JavaUtil {
         return null;
     }
 
+    /**
+     * 代入要更新的內容
+     * 
+     * @param uid
+     * @param id
+     * @param deviceId
+     * @param channelList
+     * @return Doc
+     */
     private static Document updateDocContent(String uid, String id, String deviceId, List<String> channelList) {
 
-        if (!channelList.contains(deviceId)) {
+        if (!(isEmpty(deviceId)) && !channelList.contains(deviceId)) {
             channelList.add(deviceId);
         }
 
@@ -220,7 +254,7 @@ public class JavaUtil {
     }
 
     /**
-     * 客製要輸出的 Document
+     * 客製查詢後要輸出的 Document
      * 
      * @param mongoCursor
      * @param size
@@ -306,5 +340,99 @@ public class JavaUtil {
     private static SecureRandom getRandom() throws NoSuchAlgorithmException {
         SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
         return rand;
+    }
+}
+
+class MongoBean {
+
+    private String collection = "myCol";
+
+    private String uri = "mongodb://sk:sk@localhost:27017";
+
+    private String database = "test";
+
+    enum ParamEnum {
+
+        URI("uri"),
+        DATABASE("database"),
+        COLLECTION("collection");
+
+        private String code;
+
+        ParamEnum(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+    }
+
+    enum DocEnum {
+
+        /** DeviceId */
+        REQUEST_DEVICE_ID("DeviceId"),
+        /** ID */
+        REQUEST_ID("ID"),
+        /** _id */
+        OBJECT_ID("_id"),
+        /** channel id (DeviceId) */
+        DEVICE_ID("DeviceId"),
+        /** 全通路識別碼 (UID) */
+        UID("UID"),
+        /** 客戶 ID (ID) */
+        ID("ID");
+
+        private String code;
+
+        DocEnum(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+    }
+
+    public String getCollection() {
+        return collection;
+    }
+
+    public void setCollection(String collection) {
+        this.collection = collection;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    public MongoClient mongoClient() {
+        MongoClientURI mongoClientURI = new MongoClientURI(uri);
+        MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
+        builder.connectionsPerHost(3000);
+
+        MongoClientOptions mongoClientOptions = builder.build();
+
+        MongoClient mongoClient = new MongoClient(mongoClientURI);
+        return mongoClient;
+    }
+
+    public MongoDatabase mongoDatabase() {
+        MongoDatabase mongoDatabase = mongoClient().getDatabase(database);
+        return mongoDatabase;
     }
 }
