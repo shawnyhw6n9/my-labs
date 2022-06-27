@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class JavaUtilTest {
 
     private static Logger log = LoggerFactory.getLogger(JavaUtilTest.class);
 
-    public static String MY_URI = "mongodb://sk:sk@localhost:27017";
+    public static String MY_URI = "mongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tag";
 
     public static String getMyUri() {
         return MY_URI;
@@ -115,6 +114,53 @@ public class JavaUtilTest {
         mongoCollection.drop();
 
         mongoClient.close();
+    }
+
+    @Test
+    public void testFile1m() {
+    
+        MongoBean bean = new MongoBean();
+        bean.setUri(JavaUtilTest.getMyUri());
+        String collection = bean.getCollection();
+        String database = bean.getDatabase();
+        MongoClient mongoClient = bean.mongoClient();
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+    
+        Date sDate = new Date();
+        System.out.printf("================================== Start time => %s\n\n", sDate);
+    
+        String filename = FilenameEnum.F1m.getCode();
+        List<String[]> inputDataList = parseFile(filename);
+        // FIMXE no print
+        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column 1=%s\n", r[0], r[1]));
+    
+        Date fDate = new Date();
+        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
+    
+        List<String> result = new ArrayList<String>();
+    
+        // FIXME
+        // by loop...
+        // for (String[] i: inputDataList) {
+        // result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+        // }
+        inputDataList.stream().forEach(i -> {
+            try {
+                result.add(JavaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+            } catch (Exception e) {
+                // TODOed Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+    
+        mongoClient.close();
+    
+        result.stream().forEach(r -> System.out.println(r));
+    
+        Date eDate = new Date();
+        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+    
     }
 
     @Test
@@ -224,6 +270,7 @@ public class JavaUtilTest {
      */
     enum FilenameEnum {
 
+        F1m("D:/myProject/MICB/POCII/TIDFE0019_1.1M.csv"),
         F0("D:/myProject/MICB/POCII/TIDFE0019_1.D.csv"),
         F1("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_1.D.csv"),
         F2("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_2.D.csv"),

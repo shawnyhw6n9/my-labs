@@ -163,7 +163,7 @@ public class JavaUtil {
             // 若 UID 跟輸入資料不一致， 新增一個
 
             findDocument = null;
-            // FIXME
+            // FIXME case 5
             // Document case5Document = null;
             Document case12Document = null;
 
@@ -175,7 +175,7 @@ public class JavaUtil {
                     break;
                 }
 
-                // FIXME
+                // FIXME case 5
                 // 沒有 device id ex: case 5
                 // if (!doc.containsKey(DEVICE_ID) && !isEmpty(doc.getString(ID))) {
                 // case5Document = doc;
@@ -366,11 +366,11 @@ public class JavaUtil {
 
 class MongoBean {
 
-    private String collection = "myCol";
+    private String collection = "array_test";
 
-    private String uri = "mongodb://sk:sk@localhost:27017";
+    private String uri = "mongodb://poc_mega:hk4mongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tagmongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tagg4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tag";
 
-    private String database = "test";
+    private String database = "stage";
 
     enum ParamEnum {
 
