@@ -11,11 +11,9 @@ import java.util.UUID;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.iisigroup.cap.app.config.MongodbConfig;
 import com.iisigroup.cap.app.config.MongodbConfig.DocEnum;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
