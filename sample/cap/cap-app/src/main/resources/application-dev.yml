@@ -95,3 +95,4 @@ mongodb.doc:
   uri: "mongodb://sk:sk@localhost:27017"
   database: "test"
   collection: "myCol"
+  inputFilename: "./test.csv"
