@@ -20,11 +20,56 @@ import com.mongodb.client.MongoDatabase;
 @ConfigurationProperties(prefix = "mongodb.doc")
 public class MongodbConfig {
 
-	private String uri;
+    private String uri = "mongodb://sk:sk@localhost:27017";
 
-	private String database;
+    private String collection = "array_test";
 
-	private String collection;
+    private String database = "stage";
+
+    public enum ParamEnum {
+
+        URI("uri"),
+        DATABASE("database"),
+        COLLECTION("collection");
+
+        private String code;
+
+        ParamEnum(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+    }
+
+    public enum DocEnum {
+
+        /** DeviceId */
+        REQUEST_DEVICE_ID("DeviceId"),
+        /** ID */
+        REQUEST_ID("ID"),
+        /** _id */
+        OBJECT_ID("_id"),
+        /** channel id (DeviceId) */
+        DEVICE_ID("DeviceId"),
+        /** 全通路識別碼 (UID) */
+        UID("UID"),
+        /** 客戶 ID (ID) */
+        ID("ID");
+
+        private String code;
+
+        DocEnum(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+    }
 
 	@Bean
 	public MongoClient mongoClient() {
@@ -43,7 +88,7 @@ public class MongodbConfig {
 		MongoDatabase mongoDatabase = mongoClient().getDatabase(database);
 		return mongoDatabase;
 	}
-
+	
 	public String getUri() {
 		return uri;
 	}

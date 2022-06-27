@@ -9,10 +9,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import com.iisigroup.cap.app.config.MongodbConfig;
+import com.iisigroup.cap.app.config.MongodbConfig.DocEnum;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -44,33 +49,36 @@ import com.mongodb.client.model.Filters;
  * JavaUtil.queryByDeviceAndId() = xxxxx
  * </pre>
  */
+@Component
+@Scope("prototype")
 public class JavaUtil {
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("tool.JavaUtil.java usage:");
-        System.out.printf("\tJavaUtil.getJavaUUID() \t\t= %s\n", JavaUtil.getJavaUUID());
-        System.out.printf("\tJavaUtil.getJavaUUID(%d) \t= %s\n", 20, JavaUtil.getJavaUUID(20));
-        System.out.printf("\tJavaUtil.getUUID() \t\t= %s\n", JavaUtil.getUUID());
-        System.out.printf("\tJavaUtil.queryByDeviceAndId() \t= %s\n", JavaUtil.queryByDeviceAndId(new MongoBean().mongoDatabase().getCollection("myCol"), "D1", ""));
-    }
+    @Value("${mongodb.doc.collection:}")
+    String collection;
+    
+    @Autowired(required = false)
+    private MongoDatabase mongoDatabase;
+
+    @Autowired(required = false)
+    private MongoClient mongoClient;
 
     /** DeviceId */
-    public static final String REQUEST_DEVICE_ID = MongoBean.DocEnum.REQUEST_DEVICE_ID.getCode();
+    public static final String REQUEST_DEVICE_ID = DocEnum.REQUEST_DEVICE_ID.getCode();
 
     /** ID */
-    public static final String REQUEST_ID = MongoBean.DocEnum.REQUEST_ID.getCode();
+    public static final String REQUEST_ID = DocEnum.REQUEST_ID.getCode();
 
     /** _id */
-    public static final String OBJECT_ID = MongoBean.DocEnum.OBJECT_ID.getCode();
+    public static final String OBJECT_ID = DocEnum.OBJECT_ID.getCode();
 
     /** channel id (DeviceId) */
-    public static final String DEVICE_ID = MongoBean.DocEnum.DEVICE_ID.getCode();
+    public static final String DEVICE_ID = DocEnum.DEVICE_ID.getCode();
 
     /** 全通路識別碼 (UID) */
-    public static final String UID = MongoBean.DocEnum.UID.getCode();
+    public static final String UID = DocEnum.UID.getCode();
 
     /** 客戶 ID (ID) */
-    public static final String ID = MongoBean.DocEnum.ID.getCode();
+    public static final String ID = DocEnum.ID.getCode();
 
     /**
      * 全通路處理邏輯
@@ -84,11 +92,11 @@ public class JavaUtil {
      * @return globalId (UID) String
      * @throws Exception
      */
-    public static String queryByDeviceAndId(MongoDatabase mongoDatabase, String deviceId, String id) throws Exception {
+    public String queryByDeviceAndId(MongoDatabase mongoDatabase, String deviceId, String id) throws Exception {
         if (mongoDatabase == null) {
             return null;
         }
-        return queryByDeviceAndId(mongoDatabase.getCollection(new MongoBean().getCollection()), deviceId, id);
+        return queryByDeviceAndId(mongoDatabase.getCollection(collection), deviceId, id);
     }
 
     /**
@@ -103,7 +111,7 @@ public class JavaUtil {
      * @return globalId String
      * @throws Exception
      */
-    public static String queryByDeviceAndId(MongoCollection<Document> mongoCollection, String deviceId, String id) throws Exception {
+    public String queryByDeviceAndId(MongoCollection<Document> mongoCollection, String deviceId, String id) throws Exception {
 
         // FIXMEd 取得 mongoCollection 物件
         if (mongoCollection == null) {
@@ -117,8 +125,8 @@ public class JavaUtil {
         deviceId = trimNull(deviceId);
         id = trimNull(id);
 
-        //FIXME
-//        System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
+        // FIXME
+        // System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
 
         // 用 DeviceID=XXXX or ID=XXXX 查詢 Mongo
         FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
@@ -185,7 +193,7 @@ public class JavaUtil {
                 if (isEmpty(doc.getString(ID))) {
                     case12Document = doc;
                 }
-                
+
             }
 
             if (findDocument == null) {
@@ -202,7 +210,7 @@ public class JavaUtil {
             if (case12Document != null) {
                 isNewOne = false;
             }
-            
+
             if (findDocument != null) {
                 channelList = findDocument.getList(DEVICE_ID, String.class);
             }
@@ -310,7 +318,7 @@ public class JavaUtil {
             doc.remove(OBJECT_ID);
 
             // FIXME
-//            System.out.printf("%s", doc);
+            // System.out.printf("%s", doc);
 
             resultList.add(doc);
         }
@@ -361,99 +369,5 @@ public class JavaUtil {
     private static SecureRandom getRandom() throws NoSuchAlgorithmException {
         SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
         return rand;
-    }
-}
-
-class MongoBean {
-
-    private String collection = "array_test";
-
-    private String uri = "mongodb://poc_mega:hk4mongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tagmongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tagg4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tag";
-
-    private String database = "stage";
-
-    enum ParamEnum {
-
-        URI("uri"),
-        DATABASE("database"),
-        COLLECTION("collection");
-
-        private String code;
-
-        ParamEnum(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-    }
-
-    enum DocEnum {
-
-        /** DeviceId */
-        REQUEST_DEVICE_ID("DeviceId"),
-        /** ID */
-        REQUEST_ID("ID"),
-        /** _id */
-        OBJECT_ID("_id"),
-        /** channel id (DeviceId) */
-        DEVICE_ID("DeviceId"),
-        /** 全通路識別碼 (UID) */
-        UID("UID"),
-        /** 客戶 ID (ID) */
-        ID("ID");
-
-        private String code;
-
-        DocEnum(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-    }
-
-    public String getCollection() {
-        return collection;
-    }
-
-    public void setCollection(String collection) {
-        this.collection = collection;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public MongoClient mongoClient() {
-        MongoClientURI mongoClientURI = new MongoClientURI(uri);
-        MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
-        builder.connectionsPerHost(3000);
-
-        MongoClientOptions mongoClientOptions = builder.build();
-
-        MongoClient mongoClient = new MongoClient(mongoClientURI);
-        return mongoClient;
-    }
-
-    public MongoDatabase mongoDatabase() {
-        MongoDatabase mongoDatabase = mongoClient().getDatabase(database);
-        return mongoDatabase;
     }
 }

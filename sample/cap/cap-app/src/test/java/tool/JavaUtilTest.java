@@ -21,12 +21,19 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.iisigroup.cap.app.CapApplication;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 /**
  * <pre>
@@ -40,33 +47,39 @@ import com.mongodb.client.MongoDatabase;
  *          <li>2022年6月24日,1104300,new
  *          </ul>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = CapApplication.class)
 public class JavaUtilTest {
 
-    private static Logger log = LoggerFactory.getLogger(JavaUtilTest.class);
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public static String MY_URI = "mongodb://poc_mega:hk4g4rufu4@ip-172-31-4-180.ap-southeast-1.compute.internal:27078,ip-172-31-12-79.ap-southeast-1.compute.internal:27078,ip-172-31-4-180.ap-southeast-1.compute.internal:27078/?replicaSet=tag";
+    public static String MY_URI = "mongodb://sk:sk@localhost:27017";
 
     public static String getMyUri() {
         return MY_URI;
     }
-    
+
+    @Value("${mongodb.doc.collection:}")
+    String collection;
+
+    @Autowired(required = false)
+    private MongoDatabase mongoDatabase;
+
+    @Autowired(required = false)
+    private MongoClient mongoClient;
+
+    @Autowired(required = false)
+    private JavaUtil javaUtil;
+
     @Test
     public void test() {
 
-        MongoBean bean = new MongoBean();
-        bean.setUri(JavaUtilTest.getMyUri());
-        String collection = bean.getCollection();
-        String database = bean.getDatabase();
-        MongoClient mongoClient = bean.mongoClient();
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
-        
-        Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
-        
-        try {
 
-            JavaUtil javaUtil = new JavaUtil();
+        Date sDate = new Date();
+        log.debug("================================== Start time => {}\n\n", sDate);
+
+        try {
 
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoDatabase, null, null));
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
@@ -92,86 +105,64 @@ public class JavaUtilTest {
             // TODOed Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+        log.debug("==================================   End time => {}, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
     }
 
     @Test
     public void delAll() {
-        MongoBean bean = new MongoBean();
-        bean.setUri(JavaUtilTest.getMyUri());
-        String collection = bean.getCollection();
-        String database = bean.getDatabase();
-        MongoClient mongoClient = bean.mongoClient();
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
         // FIXME
-//        mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5"),
-//                Filters.in("Id", "A456")));
+        mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5"),
+                Filters.in("Id", "A456")));
         // FIXME drop all!
-        mongoCollection.drop();
+        // mongoCollection.drop();
 
         mongoClient.close();
     }
 
     @Test
     public void testFile1m() {
-    
-        MongoBean bean = new MongoBean();
-        bean.setUri(JavaUtilTest.getMyUri());
-        String collection = bean.getCollection();
-        String database = bean.getDatabase();
-        MongoClient mongoClient = bean.mongoClient();
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
-    
+
         Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
-    
+        log.debug("================================== Start time => {}\n\n", sDate);
+
         String filename = FilenameEnum.F1m.getCode();
         List<String[]> inputDataList = parseFile(filename);
         // FIMXE no print
-        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column 1=%s\n", r[0], r[1]));
-    
+        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
+        // 1=%s\n", r[0], r[1]));
+
         Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
-    
+        log.debug("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
+
         List<String> result = new ArrayList<String>();
-    
-        // FIXME
-        // by loop...
-        // for (String[] i: inputDataList) {
-        // result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-        // }
+
         inputDataList.stream().forEach(i -> {
             try {
-                result.add(JavaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
             } catch (Exception e) {
                 // TODOed Auto-generated catch block
                 e.printStackTrace();
             }
         });
-    
+
         mongoClient.close();
-    
+
         result.stream().forEach(r -> System.out.println(r));
-    
+
         Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
-    
+        log.debug("==================================   End time => {}, {} in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+
     }
 
     @Test
     public void testFile0() {
 
-        MongoBean bean = new MongoBean();
-        bean.setUri(JavaUtilTest.getMyUri());
-        String collection = bean.getCollection();
-        String database = bean.getDatabase();
-        MongoClient mongoClient = bean.mongoClient();
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
         Date sDate = new Date();
@@ -180,21 +171,17 @@ public class JavaUtilTest {
         String filename = FilenameEnum.F0.getCode();
         List<String[]> inputDataList = parseFile(filename);
         // FIMXE no print
-        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column 1=%s\n", r[0], r[1]));
+        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
+        // 1=%s\n", r[0], r[1]));
 
         Date fDate = new Date();
         System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
 
         List<String> result = new ArrayList<String>();
 
-        // FIXME
-        // by loop...
-        // for (String[] i: inputDataList) {
-        // result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-        // }
         inputDataList.stream().forEach(i -> {
             try {
-                result.add(JavaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
             } catch (Exception e) {
                 // TODOed Auto-generated catch block
                 e.printStackTrace();
@@ -213,7 +200,8 @@ public class JavaUtilTest {
     /**
      * Parse test data file.
      * 
-     * @param filename String
+     * @param filename
+     *            String
      * @return List of result array List<String[]>
      */
     private List<String[]> parseFile(String filename) {
@@ -297,12 +285,6 @@ public class JavaUtilTest {
     @Test
     public void testFile1() {
 
-        MongoBean bean = new MongoBean();
-        bean.setUri(JavaUtilTest.getMyUri());
-        String collection = bean.getCollection();
-        String database = bean.getDatabase();
-        MongoClient mongoClient = bean.mongoClient();
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
         Date sDate = new Date();
@@ -317,13 +299,9 @@ public class JavaUtilTest {
 
         List<String> result = new ArrayList<String>();
 
-        // by loop...
-        // for (String[] i: inputDataList) {
-        // result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-        // }
         inputDataList.stream().forEach(i -> {
             try {
-                result.add(JavaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
             } catch (Exception e) {
                 // TODOed Auto-generated catch block
                 e.printStackTrace();
