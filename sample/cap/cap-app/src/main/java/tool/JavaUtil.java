@@ -117,7 +117,8 @@ public class JavaUtil {
         deviceId = trimNull(deviceId);
         id = trimNull(id);
 
-        System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
+        //FIXME
+//        System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
 
         // 用 DeviceID=XXXX or ID=XXXX 查詢 Mongo
         FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
@@ -308,7 +309,8 @@ public class JavaUtil {
             // 這邊整理一下要回應的格式，不需要的就移除
             doc.remove(OBJECT_ID);
 
-            System.out.printf("%s", doc);
+            // FIXME
+//            System.out.printf("%s", doc);
 
             resultList.add(doc);
         }
