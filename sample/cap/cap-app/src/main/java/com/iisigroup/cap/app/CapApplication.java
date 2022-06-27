@@ -116,7 +116,7 @@ public class CapApplication implements CommandLineRunner {
                 Filters.in("Id", "A456")));
 
         // FIXME
-        mongoCollection.drop();
+//        mongoCollection.drop();
 
         mongoClient.close();
     }

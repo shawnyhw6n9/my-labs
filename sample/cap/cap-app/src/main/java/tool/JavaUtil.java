@@ -53,7 +53,7 @@ public class JavaUtil {
 
     @Value("${mongodb.doc.collection:}")
     String collection;
-    
+
     @Autowired(required = false)
     private MongoDatabase mongoDatabase;
 
@@ -127,7 +127,7 @@ public class JavaUtil {
         // System.out.printf("DeviceID => %s, ID => %s\n", deviceId, id);
 
         // 用 DeviceID=XXXX or ID=XXXX 查詢 Mongo
-        FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.in(DEVICE_ID, deviceId), Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
+        FindIterable<Document> findIterable = mongoCollection.find(Filters.or(Filters.eq(DEVICE_ID, deviceId), Filters.eq(ID, id)));
 
         MongoCursor<Document> mongoCursor = findIterable.iterator();
 
@@ -212,8 +212,10 @@ public class JavaUtil {
             if (findDocument != null) {
                 channelList = findDocument.getList(DEVICE_ID, String.class);
             }
+            List<String> toChannelList = new LinkedList<String>();
+            toChannelList.addAll(channelList);
 
-            toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, channelList);
+            toApplyDocument = updateDocContent(findDocument.getString(UID), id, deviceId, toChannelList);
 
         }
 
@@ -225,7 +227,10 @@ public class JavaUtil {
                 if (isNewOne) {
                     mongoCollection.insertOne(toApplyDocument);
                 } else {
-                    mongoCollection.updateOne(Filters.eq(UID, toApplyDocument.getString(UID)), new Document("$set", toApplyDocument));
+                    boolean isNeedUpdate = checkNeedUpdate(findDocument, toApplyDocument, id, deviceId);
+                    if (isNeedUpdate) {
+                        mongoCollection.updateOne(Filters.eq(UID, toApplyDocument.getString(UID)), new Document("$set", toApplyDocument));
+                    }
                 }
             }
 
@@ -234,6 +239,18 @@ public class JavaUtil {
         }
 
         return null;
+    }
+
+    private boolean checkNeedUpdate(Document findDocument, Document toApplyDocument, String id, String deviceId) {
+        if (findDocument == null) {
+            return false;
+        }
+        
+        List<String> fChannelList = findDocument.getList(DEVICE_ID, String.class);
+        List<String> toChannelList = toApplyDocument.getList(DEVICE_ID, String.class);
+
+        // 當查詢到物件時如果 Device ID & ID 都相同就回傳 UID 然後結束
+        return !(id.equalsIgnoreCase(findDocument.getString(ID)) && fChannelList.contains(deviceId) && toChannelList.contains(deviceId));
     }
 
     /**
