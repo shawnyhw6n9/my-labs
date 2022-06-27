@@ -43,6 +43,9 @@ public class CapApplication implements CommandLineRunner {
     @Value("${mongodb.doc.collection:}")
     String collection;
 
+    @Value("${mongodb.doc.inputFilename:./test.csv}")
+    String inputFilename;
+
     @Autowired(required = false)
     private MongoDatabase mongoDatabase;
 
@@ -55,8 +58,20 @@ public class CapApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        testFile1m();
-        
+        System.out.printf("Test Type => %s\n", args[1]);
+
+        if ("1".equals(args[1])) {
+            delAll();
+        } else if ("2".equals(args[1])) {
+            test();
+        } else if ("3".equals(args[1])) {
+            testFile0();
+        } else if ("4".equals(args[1])) {
+            testFile1m();
+        } else if ("5".equals(args[1])) {
+            testFile1();
+        }
+
     }
 
     public void test() {
@@ -135,7 +150,7 @@ public class CapApplication implements CommandLineRunner {
 
         mongoClient.close();
 
-        result.stream().forEach(r -> System.out.println(r));
+        // result.stream().forEach(r -> System.out.println(r));
 
         Date eDate = new Date();
         System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
@@ -149,7 +164,7 @@ public class CapApplication implements CommandLineRunner {
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
-        String filename = FilenameEnum.F1m.getCode();
+        String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F1m.getCode();
         List<String[]> inputDataList = parseFile(filename);
         // FIMXE no print
         // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
@@ -206,7 +221,7 @@ public class CapApplication implements CommandLineRunner {
 
         mongoClient.close();
 
-        result.stream().forEach(r -> System.out.println(r));
+        // result.stream().forEach(r -> System.out.println(r));
 
         Date eDate = new Date();
         System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
