@@ -21,19 +21,13 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.iisigroup.cap.app.CapApplication;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * <pre>
@@ -47,37 +41,30 @@ import com.mongodb.client.model.Filters;
  *          <li>2022年6月24日,1104300,new
  *          </ul>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = CapApplication.class)
 public class JavaUtilTest {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-
     public static String MY_URI = "mongodb://sk:sk@localhost:27017";
+    public static String MY_DB_NAME = "stage";
+    public static String MY_COLLECTION = "array_test";
+    public static String FILENAME = "D:\\myProject\\MICB\\POCII\\_history\\IDFE0019_2.D10W_Norman.csv";
 
-    public static String getMyUri() {
-        return MY_URI;
-    }
+    private MongoClientURI mongoClientURI = new MongoClientURI(MY_URI);
 
-    @Value("${mongodb.doc.collection:}")
-    String collection;
+    private MongoClient mongoClient = new MongoClient(mongoClientURI);
 
-    @Autowired(required = false)
-    private MongoDatabase mongoDatabase;
+    private MongoDatabase mongoDatabase = mongoClient.getDatabase(MY_DB_NAME);
 
-    @Autowired(required = false)
-    private MongoClient mongoClient;
-
-    @Autowired(required = false)
-    private JavaUtil javaUtil;
+    private JavaUtil javaUtil = new JavaUtil();
 
     @Test
     public void test() {
 
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+        MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
+
+        javaUtil.collection = MY_COLLECTION;
 
         Date sDate = new Date();
-        log.debug("================================== Start time => {}\n\n", sDate);
+        System.out.printf("================================== Start time => %s\n\n", sDate);
 
         try {
 
@@ -99,6 +86,8 @@ public class JavaUtilTest {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
+            result.stream().forEach(r -> System.out.println(r));
+
             mongoClient.close();
 
         } catch (Exception e) {
@@ -107,72 +96,60 @@ public class JavaUtilTest {
         }
 
         Date eDate = new Date();
-        log.debug("==================================   End time => {}, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
     }
 
     @Test
     public void delAll() {
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+        MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        // FIXME
-        mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5"),
-                Filters.in("Id", "A456")));
-        // FIXME drop all!
-        // mongoCollection.drop();
+        javaUtil.collection = MY_COLLECTION;
+
+        DeleteResult r = mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"),
+                Filters.in("DeviceId", "D5"), Filters.in("Id", "A456")));
+        System.out.printf("%s\n", r);
 
         mongoClient.close();
     }
 
     @Test
-    public void testFile1m() {
+    public void testFileOneLine() {
 
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+        MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        Date sDate = new Date();
-        log.debug("================================== Start time => {}\n\n", sDate);
-
-        String filename = FilenameEnum.F1m.getCode();
-        List<String[]> inputDataList = parseFile(filename);
-        // FIMXE no print
-        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
-        // 1=%s\n", r[0], r[1]));
-
-        Date fDate = new Date();
-        log.debug("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
-
-        List<String> result = new ArrayList<String>();
-
-        inputDataList.stream().forEach(i -> {
-            try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-            } catch (Exception e) {
-                // TODOed Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-
-        mongoClient.close();
-
-        result.stream().forEach(r -> System.out.println(r));
-
-        Date eDate = new Date();
-        log.debug("==================================   End time => {}, {} in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
-
-    }
-
-    @Test
-    public void testFile0() {
-
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
+        javaUtil.collection = MY_COLLECTION;
 
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
-        String filename = FilenameEnum.F0.getCode();
+        String filename = FILENAME;
+
+        try {
+            parseFileAndQuery(filename, mongoCollection, javaUtil);
+        } catch (Exception e) {
+            // TODOed Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            mongoClient.close();
+        }
+
+        Date eDate = new Date();
+        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+
+    }
+
+    @Test
+    public void testFile() {
+
+        MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
+
+        javaUtil.collection = MY_COLLECTION;
+
+        Date sDate = new Date();
+        System.out.printf("================================== Start time => %s\n\n", sDate);
+
+        String filename = FILENAME;
         List<String[]> inputDataList = parseFile(filename);
-        // FIMXE no print
-        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
-        // 1=%s\n", r[0], r[1]));
 
         Date fDate = new Date();
         System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
@@ -181,20 +158,68 @@ public class JavaUtilTest {
 
         inputDataList.stream().forEach(i -> {
             try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+                String r = javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]);
+                result.add(r);
+                System.out.printf("%s\n", r);
             } catch (Exception e) {
                 // TODOed Auto-generated catch block
                 e.printStackTrace();
             }
         });
 
-        mongoClient.close();
+        // result.stream().forEach(r-> System.out.println(r));
 
-        result.stream().forEach(r -> System.out.println(r));
+        mongoClient.close();
 
         Date eDate = new Date();
         System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
 
+    }
+
+    /**
+     * Parse test data file with mongoCollection and javaUtil.
+     * 
+     * @param filename
+     *            String
+     * @param mongoCollection
+     * @param javaUtil
+     */
+    private void parseFileAndQuery(String filename, MongoCollection mongoCollection, JavaUtil javaUtil) {
+
+        // use comma as separator
+        String splitRegex = ",";
+        int limit = 5;
+
+        List<String[]> resultList = new ArrayList<String[]>();
+
+        BufferedReader br = null;
+        String line;
+        try {
+            br = new BufferedReader(new FileReader(filename));
+            while ((line = br.readLine()) != null) {
+                String[] cols = line.split(splitRegex, limit);
+                String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[3], cols[4]);
+                System.out.printf("%s\n", r);
+            }
+        } catch (FileNotFoundException e1) {
+            // TODOed Auto-generated catch block
+            e1.printStackTrace();
+        } catch (IOException e) {
+            // TODOed Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODOed Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // TODOed Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -208,7 +233,7 @@ public class JavaUtilTest {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 3;
+        int limit = 5;
 
         List<String[]> resultList = new ArrayList<String[]>();
 
@@ -218,7 +243,7 @@ public class JavaUtilTest {
             br = new BufferedReader(new FileReader(filename));
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split(splitRegex, limit);
-                String[] ary = { cols[0], cols[1] };
+                String[] ary = { cols[3], cols[4] };
                 resultList.add(ary);
             }
         } catch (FileNotFoundException e1) {
@@ -239,82 +264,6 @@ public class JavaUtilTest {
         }
 
         return resultList;
-    }
-
-    /**
-     * <ol>
-     * <li>D:/myProject/MICB/POCII/TIDFE0019_1.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_1.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_2.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_3.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_4.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_5.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_6.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_7.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_8.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_9.D.csv
-     * <li>D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_10.D.csv
-     * </ol>
-     */
-    enum FilenameEnum {
-
-        F1m("D:/myProject/MICB/POCII/TIDFE0019_1.1M.csv"),
-        F0("D:/myProject/MICB/POCII/TIDFE0019_1.D.csv"),
-        F1("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_1.D.csv"),
-        F2("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_2.D.csv"),
-        F3("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_3.D.csv"),
-        F4("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_4.D.csv"),
-        F5("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_5.D.csv"),
-        F6("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_6.D.csv"),
-        F7("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_7.D.csv"),
-        F8("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_8.D.csv"),
-        F9("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_9.D.csv"),
-        F10("D:/myProject/MICB/POCII/IDFE0019_10W/TIDFE0019_10.D.csv");
-
-        private String code;
-
-        FilenameEnum(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-    }
-
-    @Test
-    public void testFile1() {
-
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
-
-        Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
-
-        String filename = FilenameEnum.F1.getCode();
-        List<String[]> inputDataList = parseFile(filename);
-        inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column 1=%s\n", r[0], r[1]));
-
-        Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
-
-        List<String> result = new ArrayList<String>();
-
-        inputDataList.stream().forEach(i -> {
-            try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-            } catch (Exception e) {
-                // TODOed Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-
-        mongoClient.close();
-
-        result.stream().forEach(r -> System.out.println(r));
-
-        Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
-
     }
 
 }

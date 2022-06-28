@@ -65,11 +65,7 @@ public class CapApplication implements CommandLineRunner {
         } else if ("2".equals(args[1])) {
             test();
         } else if ("3".equals(args[1])) {
-            testFile0();
-        } else if ("4".equals(args[1])) {
             testFile1m();
-        } else if ("5".equals(args[1])) {
-            testFile1();
         }
 
     }
@@ -106,7 +102,7 @@ public class CapApplication implements CommandLineRunner {
         }
 
         Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate.getTime() - sDate.getTime()));
     }
 
     public void delAll() {
@@ -116,45 +112,9 @@ public class CapApplication implements CommandLineRunner {
                 Filters.in("Id", "A456")));
 
         // FIXME
-//        mongoCollection.drop();
+        mongoCollection.drop();
 
         mongoClient.close();
-    }
-
-    public void testFile0() {
-
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
-
-        Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
-
-        String filename = FilenameEnum.F0.getCode();
-        List<String[]> inputDataList = parseFile(filename);
-        // FIMXE no print
-        // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
-        // 1=%s\n", r[0], r[1]));
-
-        Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
-
-        List<String> result = new ArrayList<String>();
-
-        inputDataList.stream().forEach(i -> {
-            try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-            } catch (Exception e) {
-                // TODOed Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-
-        mongoClient.close();
-
-        // result.stream().forEach(r -> System.out.println(r));
-
-        Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
-
     }
 
     public void testFile1m() {
@@ -190,44 +150,11 @@ public class CapApplication implements CommandLineRunner {
         // result.stream().forEach(r -> System.out.println(r));
 
         Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate.getTime() - sDate.getTime()));
 
     }
 
-    public void testFile1() {
-
-        MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
-
-        Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
-
-        String filename = FilenameEnum.F1.getCode();
-        List<String[]> inputDataList = parseFile(filename);
-        inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column 1=%s\n", r[0], r[1]));
-
-        Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
-
-        List<String> result = new ArrayList<String>();
-
-        inputDataList.stream().forEach(i -> {
-            try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
-            } catch (Exception e) {
-                // TODOed Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-
-        mongoClient.close();
-
-        // result.stream().forEach(r -> System.out.println(r));
-
-        Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
-
-    }
-
+    
     /**
      * Parse test data file.
      * 

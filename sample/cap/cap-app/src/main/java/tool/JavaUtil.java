@@ -52,7 +52,7 @@ import com.mongodb.client.model.Filters;
 public class JavaUtil {
 
     @Value("${mongodb.doc.collection:}")
-    String collection;
+    public String collection;
 
     @Autowired(required = false)
     private MongoDatabase mongoDatabase;
@@ -245,7 +245,7 @@ public class JavaUtil {
         if (findDocument == null) {
             return false;
         }
-        
+
         List<String> fChannelList = findDocument.getList(DEVICE_ID, String.class);
         List<String> toChannelList = toApplyDocument.getList(DEVICE_ID, String.class);
 
