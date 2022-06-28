@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.iisigroup.cap.app.config.MongodbConfig.DocEnum;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -51,6 +52,29 @@ import com.mongodb.client.model.Filters;
 @Scope("prototype")
 public class JavaUtil {
 
+    public static void main(String[] args) {
+        String myUri = "mongodb://sk:sk@localhost:27017";
+        String myDbName = "stage";
+        String myCollection = "array_test";
+
+        MongoClientURI mongoClientURI = new MongoClientURI(myUri);
+
+        MongoClient mongoClient = new MongoClient(mongoClientURI);
+
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(myDbName);
+
+        JavaUtil javaUtil = new JavaUtil();
+        javaUtil.collection = myCollection;
+        
+        try {
+            System.out.println(javaUtil.queryByDeviceAndId(mongoDatabase, "D1", null));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            mongoClient.close();
+        }
+    }
+    
     @Value("${mongodb.doc.collection:}")
     public String collection;
 
