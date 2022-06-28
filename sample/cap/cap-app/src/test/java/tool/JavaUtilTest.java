@@ -188,7 +188,9 @@ public class JavaUtilTest {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 5;
+        int limit = 3;
+        int i = 0;
+        int j = 1;
 
         List<String[]> resultList = new ArrayList<String[]>();
 
@@ -198,8 +200,8 @@ public class JavaUtilTest {
             br = new BufferedReader(new FileReader(filename));
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split(splitRegex, limit);
-                String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[3], cols[4]);
-                System.out.printf("%s\n", r);
+                String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
+                System.out.printf("count=%d, %s\n", r);
             }
         } catch (FileNotFoundException e1) {
             // TODOed Auto-generated catch block
@@ -233,7 +235,9 @@ public class JavaUtilTest {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 5;
+        int limit = 3;
+        int i = 0;
+        int j = 1;
 
         List<String[]> resultList = new ArrayList<String[]>();
 
@@ -243,7 +247,7 @@ public class JavaUtilTest {
             br = new BufferedReader(new FileReader(filename));
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split(splitRegex, limit);
-                String[] ary = { cols[3], cols[4] };
+                String[] ary = { cols[i], cols[j] };
                 resultList.add(ary);
             }
         } catch (FileNotFoundException e1) {

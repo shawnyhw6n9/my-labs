@@ -65,16 +65,17 @@ public class JavaUtil {
 
         JavaUtil javaUtil = new JavaUtil();
         javaUtil.collection = myCollection;
-        
+        MongoCollection mongoCollection = mongoDatabase.getCollection(myCollection);
+
         try {
-            System.out.println(javaUtil.queryByDeviceAndId(mongoDatabase, "D1", null));
+            System.out.println(javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             mongoClient.close();
         }
     }
-    
+
     @Value("${mongodb.doc.collection:}")
     public String collection;
 
@@ -258,8 +259,15 @@ public class JavaUtil {
                 }
             }
 
+            // resultList = null;
+            // channelList = null;
+            // findDocument = null;
+            String u = toApplyDocument.getString(UID);
+            // toApplyDocument = null;
+            // resultList = null;
+
             // 並回傳 UID
-            return trim(toApplyDocument.getString(UID));
+            return trim(u);
         }
 
         return null;
