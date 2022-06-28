@@ -198,10 +198,11 @@ public class JavaUtilTest {
         String line;
         try {
             br = new BufferedReader(new FileReader(filename));
+            int c = 0;
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split(splitRegex, limit);
                 String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
-                System.out.printf("count=%d, %s\n", r);
+                System.out.printf("count=%d, %s\n", ++c, r);
             }
         } catch (FileNotFoundException e1) {
             // TODOed Auto-generated catch block
