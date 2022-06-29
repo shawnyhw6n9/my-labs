@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -78,7 +77,7 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Date sDate = new Date();
+        Long sDate = System.currentTimeMillis();;
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
         try {
@@ -108,8 +107,8 @@ public class CapApplication implements CommandLineRunner {
             e.printStackTrace();
         }
 
-        Date eDate = new Date();
-        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate.getTime() - sDate.getTime()));
+        Long eDate = System.currentTimeMillis();;
+        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
     }
 
     public void delAll() {
@@ -119,7 +118,7 @@ public class CapApplication implements CommandLineRunner {
                 Filters.in("Id", "A456")));
 
         // FIXME
-        mongoCollection.drop();
+//        mongoCollection.drop();
 
         mongoClient.close();
     }
@@ -128,7 +127,7 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Date sDate = new Date();
+        Long sDate = System.currentTimeMillis();;
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
         String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F1201.getCode();
@@ -137,8 +136,8 @@ public class CapApplication implements CommandLineRunner {
         // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
         // 1=%s\n", r[0], r[1]));
 
-        Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
+        Long fDate = System.currentTimeMillis();;
+        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate - sDate));
 
         try {
             parseFileAndQuery(filename, mongoCollection, javaUtil);
@@ -149,8 +148,8 @@ public class CapApplication implements CommandLineRunner {
             mongoClient.close();
         }
 
-        Date eDate = new Date();
-        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate.getTime() - sDate.getTime()));
+        Long eDate = System.currentTimeMillis();;
+        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
 
     }
 
@@ -158,23 +157,25 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Date sDate = new Date();
+        Long sDate = System.currentTimeMillis();;
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
-        String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F1201.getCode();
+        String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F3010.getCode();
         List<String[]> inputDataList = parseFile(filename);
 
         // FIMXE no print
         // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
         // 1=%s\n", r[0], r[1]));
 
-        Date fDate = new Date();
-        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate.getTime() - sDate.getTime()));
+        Long fDate = System.currentTimeMillis();;
+        System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate - sDate));
 
         List<String> result = new ArrayList<String>();
         inputDataList.stream().forEach(i -> {
             try {
-                result.add(javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]));
+                String r = javaUtil.queryByDeviceAndId(mongoCollection, i[0], i[1]);
+                result.add(r);
+                System.out.printf("%s\n", r);
             } catch (Exception e) {
                 // TODOed Auto-generated catch block
                 e.printStackTrace();
@@ -187,8 +188,8 @@ public class CapApplication implements CommandLineRunner {
         // result.stream().forEach(r -> System.out.println(r));
         collect.stream().forEach(System.out::println);
 
-        Date eDate = new Date();
-        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate.getTime() - sDate.getTime()));
+        Long eDate = System.currentTimeMillis();;
+        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
 
     }
 
@@ -204,7 +205,6 @@ public class CapApplication implements CommandLineRunner {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 3;
         int i = 0;
         int j = 1;
 
@@ -216,7 +216,7 @@ public class CapApplication implements CommandLineRunner {
             br = new BufferedReader(new FileReader(filename));
             int c = 0;
             while ((line = br.readLine()) != null) {
-                String[] cols = line.split(splitRegex, limit);
+                String[] cols = line.split(splitRegex);
                 String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
                 System.out.printf("count= %d, %s\n", ++c, r);
             }
@@ -252,7 +252,6 @@ public class CapApplication implements CommandLineRunner {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 3;
 
         List<String[]> resultList = new ArrayList<String[]>();
 
@@ -261,7 +260,7 @@ public class CapApplication implements CommandLineRunner {
         try {
             br = new BufferedReader(new FileReader(filename));
             while ((line = br.readLine()) != null) {
-                String[] cols = line.split(splitRegex, limit);
+                String[] cols = line.split(splitRegex);
                 String[] ary = { cols[0], cols[1] };
                 resultList.add(ary);
             }

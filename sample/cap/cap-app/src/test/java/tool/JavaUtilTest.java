@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,7 +66,7 @@ public class JavaUtilTest {
         javaUtil.collection = MY_COLLECTION;
 
         Date sDate = new Date();
-        System.out.printf("================================== Start time => %s\n\n", sDate);
+        System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
 
         try {
 
@@ -86,8 +88,9 @@ public class JavaUtilTest {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
-            result.stream().forEach(r -> System.out.println(r));
-
+            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> (index == 0 ? "" : ", ") + " {UID: \"" + result.get(index)+"\"}").collect(Collectors.toList());
+            collect.stream().forEach(System.out::println);
+            
             mongoClient.close();
 
         } catch (Exception e) {
@@ -96,7 +99,7 @@ public class JavaUtilTest {
         }
 
         Date eDate = new Date();
-        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+        System.out.printf("\n]}\n\n==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
     }
 
     @Test
@@ -167,7 +170,9 @@ public class JavaUtilTest {
             }
         });
 
-        // result.stream().forEach(r-> System.out.println(r));
+        List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> "count= "+index + ", " + result.get(index)).collect(Collectors.toList());
+        // result.stream().forEach(r -> System.out.println(r));
+        collect.stream().forEach(System.out::println);
 
         mongoClient.close();
 
@@ -200,7 +205,7 @@ public class JavaUtilTest {
             br = new BufferedReader(new FileReader(filename));
             int c = 0;
             while ((line = br.readLine()) != null) {
-                String[] cols = line.split(splitRegex, limit);
+                String[] cols = line.split(splitRegex);
                 String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
                 System.out.printf("count=%d, %s\n", ++c, r);
             }
@@ -247,7 +252,7 @@ public class JavaUtilTest {
         try {
             br = new BufferedReader(new FileReader(filename));
             while ((line = br.readLine()) != null) {
-                String[] cols = line.split(splitRegex, limit);
+                String[] cols = line.split(splitRegex);
                 String[] ary = { cols[i], cols[j] };
                 resultList.add(ary);
             }
