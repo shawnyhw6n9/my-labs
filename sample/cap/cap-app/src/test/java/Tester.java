@@ -24,7 +24,7 @@ public class Tester {
         MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoDBname);
         
         JavaUtil j = new JavaUtil();
-        j.collection=collection;
+        j.setCollection(collection);
         
         try(FileReader fileReader = new FileReader("D:\\myProject\\MICB\\POCII\\_history\\IDFE0019_2.D10W_Norman.csv")) {
             BufferedReader reader = new BufferedReader(fileReader);

@@ -76,7 +76,7 @@ logging:
         discovery: DEBUG
     org:
       hibernate.type: WARN
-
+    org.mongodb: OFF
 #swaggerConfig:
   #apiVersion: ${project.version}
 

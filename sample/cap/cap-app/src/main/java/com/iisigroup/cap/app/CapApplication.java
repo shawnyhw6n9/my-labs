@@ -59,16 +59,24 @@ public class CapApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        System.out.printf("Test Type => %s\n", args[1]);
+        List<String> collect = IntStream.range(0, args.length).mapToObj(i -> args[i]).collect(Collectors.toList());
+        collect.stream().forEach(System.out::println);
 
-        if ("1".equals(args[1])) {
-            delAll();
-        } else if ("2".equals(args[1])) {
+        if (args.length > 1) {
+            
+            System.out.printf("Test Type => %s\n", args[1]);
+
+            if ("1".equals(args[1])) {
+                delAll();
+            } else if ("2".equals(args[1])) {
+                test();
+            } else if ("3".equals(args[1])) {
+                testFileOneLine();
+            } else if ("4".equals(args[1])) {
+                testFile();
+            }
+        }else {
             test();
-        } else if ("3".equals(args[1])) {
-            testFileOneLine();
-        } else if ("4".equals(args[1])) {
-            testFile();
         }
 
     }
@@ -77,8 +85,9 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Long sDate = System.currentTimeMillis();;
-        System.out.printf("================================== Start time => %s\n\n", sDate);
+        Long sDate = System.currentTimeMillis();
+        ;
+        System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
 
         try {
 
@@ -98,17 +107,20 @@ public class CapApplication implements CommandLineRunner {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
             mongoClient.close();
-            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> "count= "+index + ", " + result.get(index)).collect(Collectors.toList());
+
+            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("count= %d%s {UID: \"%s\"}", index, (index == 0 ? " " : ", "), result.get(index)))
+                    .collect(Collectors.toList());
 
             collect.stream().forEach(System.out::println);
-            
+
         } catch (Exception e) {
             // TODOed Auto-generated catch block
             e.printStackTrace();
         }
 
-        Long eDate = System.currentTimeMillis();;
-        System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
+        Long eDate = System.currentTimeMillis();
+        ;
+        System.out.printf("\n]}\n\n==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
     }
 
     public void delAll() {
@@ -117,9 +129,6 @@ public class CapApplication implements CommandLineRunner {
         mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"), Filters.in("DeviceId", "D5"),
                 Filters.in("Id", "A456")));
 
-        // FIXME
-//        mongoCollection.drop();
-
         mongoClient.close();
     }
 
@@ -127,7 +136,8 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Long sDate = System.currentTimeMillis();;
+        Long sDate = System.currentTimeMillis();
+        ;
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
         String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F1201.getCode();
@@ -136,7 +146,8 @@ public class CapApplication implements CommandLineRunner {
         // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
         // 1=%s\n", r[0], r[1]));
 
-        Long fDate = System.currentTimeMillis();;
+        Long fDate = System.currentTimeMillis();
+        ;
         System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate - sDate));
 
         try {
@@ -148,7 +159,8 @@ public class CapApplication implements CommandLineRunner {
             mongoClient.close();
         }
 
-        Long eDate = System.currentTimeMillis();;
+        Long eDate = System.currentTimeMillis();
+        ;
         System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
 
     }
@@ -157,7 +169,7 @@ public class CapApplication implements CommandLineRunner {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(collection);
 
-        Long sDate = System.currentTimeMillis();;
+        Long sDate = System.currentTimeMillis();
         System.out.printf("================================== Start time => %s\n\n", sDate);
 
         String filename = !javaUtil.isEmpty(inputFilename) ? inputFilename : FilenameEnum.F3010.getCode();
@@ -167,7 +179,7 @@ public class CapApplication implements CommandLineRunner {
         // inputDataList.stream().forEach(r -> System.out.printf("Coulmn 0= %s, Column
         // 1=%s\n", r[0], r[1]));
 
-        Long fDate = System.currentTimeMillis();;
+        Long fDate = System.currentTimeMillis();
         System.out.printf("==================================   Parse File Process time => %d in milliseconds\n\n", (fDate - sDate));
 
         List<String> result = new ArrayList<String>();
@@ -183,12 +195,13 @@ public class CapApplication implements CommandLineRunner {
         });
 
         mongoClient.close();
-        List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> "count= "+index + ", " + result.get(index)).collect(Collectors.toList());
+        List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> "count= " + index + " { UID: \"" + result.get(index) + "\"}").collect(Collectors.toList());
 
         // result.stream().forEach(r -> System.out.println(r));
         collect.stream().forEach(System.out::println);
 
-        Long eDate = System.currentTimeMillis();;
+        Long eDate = System.currentTimeMillis();
+        ;
         System.out.printf("==================================   Start time => %s, End time => %s, %d in milliseconds\n\n", sDate, eDate, (eDate - sDate));
 
     }

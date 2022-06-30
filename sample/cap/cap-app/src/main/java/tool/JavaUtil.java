@@ -1,9 +1,15 @@
 package tool;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +62,14 @@ public class JavaUtil {
         String myUri = "mongodb://sk:sk@localhost:27017";
         String myDbName = "stage";
         String myCollection = "array_test";
+        String filenameTest = "./test.csv";
+        String filenameNormanSample = "./IDFE0019_2.D10W_Norman.csv";
+
+        filenameNormanSample = args.length > 4 ? args[4] : filenameNormanSample;
+        filenameTest = args.length > 3 ? args[3] : filenameTest;
+        myCollection = args.length > 2 ? args[2] : myCollection;
+        myDbName = args.length > 1 ? args[1] : myDbName;
+        myUri = args.length > 0 ? args[0] : myUri;
 
         MongoClientURI mongoClientURI = new MongoClientURI(myUri);
 
@@ -67,17 +81,84 @@ public class JavaUtil {
         javaUtil.collection = myCollection;
         MongoCollection mongoCollection = mongoDatabase.getCollection(myCollection);
 
+        Date sDate = new Date();
+        System.out.printf("================================== Start time => %s\n\n", sDate);
+
         try {
-            System.out.println(javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
-        } catch (Exception e) {
-            e.printStackTrace();
+            String filename = "";
+            if (new File(filenameTest).exists()) {
+                filename = filenameTest;
+            } else {
+                filename = filenameNormanSample;
+            }
+            javaUtil.parseFileAndQuery(filename, mongoCollection, javaUtil);
         } finally {
             mongoClient.close();
+        }
+
+        Date eDate = new Date();
+        System.out.printf("==================================   End time => %s, %d in milliseconds\n\n", eDate, (eDate.getTime() - sDate.getTime()));
+
+    }
+
+    /**
+     * Parse test data file with mongoCollection and javaUtil.
+     * 
+     * @param filename
+     *            String
+     * @param mongoCollection
+     * @param javaUtil
+     */
+    private void parseFileAndQuery(String filename, MongoCollection mongoCollection, JavaUtil javaUtil) {
+
+        // use comma as separator
+        String splitRegex = ",";
+        int limit = 3;
+        int i = 0;
+        int j = 1;
+
+        if (filename.endsWith("Norman.csv")) {
+            limit = 5;
+            i = 3;
+            j = 4;
+        }
+
+        List<String[]> resultList = new ArrayList<String[]>();
+
+        BufferedReader br = null;
+        String line;
+        try (FileReader fr = new FileReader(filename)) {
+            br = new BufferedReader(fr);
+            int c = 0;
+            while ((line = br.readLine()) != null) {
+                // String[] cols = line.split(",", limit);
+                String[] cols = line.split(",");
+                String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
+                System.out.printf("count=%d, %s\n", ++c, r);
+            }
+        } catch (FileNotFoundException e1) {
+            // TODOed Auto-generated catch block
+            e1.printStackTrace();
+        } catch (IOException e) {
+            // TODOed Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODOed Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // TODOed Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Value("${mongodb.doc.collection:}")
-    public String collection;
+    private String collection;
 
     @Autowired(required = false)
     private MongoDatabase mongoDatabase;
@@ -417,4 +498,13 @@ public class JavaUtil {
         SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
         return rand;
     }
+
+    public String getCollection() {
+        return collection;
+    }
+
+    public void setCollection(String collection) {
+        this.collection = collection;
+    }
+
 }

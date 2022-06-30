@@ -48,7 +48,7 @@ public class JavaUtilTest {
     public static String MY_URI = "mongodb://sk:sk@localhost:27017";
     public static String MY_DB_NAME = "stage";
     public static String MY_COLLECTION = "array_test";
-    public static String FILENAME = "D:\\myProject\\MICB\\POCII\\_history\\IDFE0019_2.D10W_Norman.csv";
+    public static String FILENAME = "./test.csv";
 
     private MongoClientURI mongoClientURI = new MongoClientURI(MY_URI);
 
@@ -63,7 +63,7 @@ public class JavaUtilTest {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        javaUtil.collection = MY_COLLECTION;
+        javaUtil.setCollection(MY_COLLECTION);
 
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
@@ -88,7 +88,7 @@ public class JavaUtilTest {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
 
-            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> (index == 0 ? "" : ", ") + " {UID: \"" + result.get(index)+"\"}").collect(Collectors.toList());
+            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("count= %d%s {UID: \"%s\"}",  index , (index == 0 ? " " : ", "), result.get(index))).collect(Collectors.toList());
             collect.stream().forEach(System.out::println);
             
             mongoClient.close();
@@ -106,7 +106,7 @@ public class JavaUtilTest {
     public void delAll() {
         MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        javaUtil.collection = MY_COLLECTION;
+        javaUtil.setCollection(MY_COLLECTION);
 
         DeleteResult r = mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"),
                 Filters.in("DeviceId", "D5"), Filters.in("Id", "A456")));
@@ -120,7 +120,7 @@ public class JavaUtilTest {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        javaUtil.collection = MY_COLLECTION;
+        javaUtil.setCollection(MY_COLLECTION);
 
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n", sDate);
@@ -146,7 +146,7 @@ public class JavaUtilTest {
 
         MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
-        javaUtil.collection = MY_COLLECTION;
+        javaUtil.setCollection(MY_COLLECTION);
 
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n", sDate);
@@ -193,40 +193,27 @@ public class JavaUtilTest {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 3;
-        int i = 0;
-        int j = 1;
+        int i = 3;
+        int j = 4;
+        int c = 0;
+        
+        if (filename.endsWith("Norman.csv")) {
+            i = 3;
+            j = 4;
+        }
 
-        List<String[]> resultList = new ArrayList<String[]>();
-
-        BufferedReader br = null;
         String line;
-        try {
-            br = new BufferedReader(new FileReader(filename));
-            int c = 0;
+        try (FileReader fr = new FileReader(filename)){
+            BufferedReader br = new BufferedReader(fr);
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split(splitRegex);
                 String r = javaUtil.queryByDeviceAndId(mongoCollection, cols[i], cols[j]);
-                System.out.printf("count=%d, %s\n", ++c, r);
+                c++;
+                System.out.printf("count=%d, %s\n", c, r);
             }
-        } catch (FileNotFoundException e1) {
-            // TODOed Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e) {
-            // TODOed Auto-generated catch block
-            e.printStackTrace();
         } catch (Exception e) {
             // TODOed Auto-generated catch block
             e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    // TODOed Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -241,10 +228,14 @@ public class JavaUtilTest {
 
         // use comma as separator
         String splitRegex = ",";
-        int limit = 3;
-        int i = 0;
-        int j = 1;
-
+        int i = 3;
+        int j = 4;
+        
+        if (filename.endsWith("Norman.csv")) {
+            i = 3;
+            j = 4;
+        }
+        
         List<String[]> resultList = new ArrayList<String[]>();
 
         BufferedReader br = null;
