@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,6 +65,8 @@ public class JavaUtilTest {
         MongoCollection mongoCollection = mongoDatabase.getCollection(MY_COLLECTION);
 
         javaUtil.setCollection(MY_COLLECTION);
+        javaUtil.setAtomicUid(new AtomicInteger());
+        javaUtil.setAtomicCount(new AtomicInteger());
 
         Date sDate = new Date();
         System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
@@ -114,8 +117,8 @@ public class JavaUtilTest {
 
         javaUtil.setCollection(MY_COLLECTION);
 
-        DeleteResult r = mongoCollection.deleteMany(Filters.or(Filters.in("DeviceId", "D1"), Filters.in("DeviceId", "D2"), Filters.in("DeviceId", "D3"), Filters.in("DeviceId", "D4"),
-                Filters.in("DeviceId", "D5"), Filters.in("Id", "A456")));
+        DeleteResult r = mongoCollection.deleteMany(Filters.or(Filters.eq("DeviceId", "D1"), Filters.eq("DeviceId", "D2"), Filters.eq("DeviceId", "D3"), Filters.eq("DeviceId", "D4"),
+                Filters.eq("DeviceId", "D5"), Filters.eq("Id", "A456")));
         System.out.printf("%s\n", r);
 
         mongoClient.close();

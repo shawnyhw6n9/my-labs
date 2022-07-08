@@ -80,6 +80,8 @@ public class JavaUtil {
 
         JavaUtil javaUtil = new JavaUtil();
         javaUtil.collection = myCollection;
+        javaUtil.setAtomicUid(new AtomicInteger());
+        javaUtil.setAtomicCount(new AtomicInteger());
         MongoCollection mongoCollection = mongoDatabase.getCollection(myCollection);
 
         Date sDate = new Date();
@@ -185,9 +187,11 @@ public class JavaUtil {
     /** 客戶 ID (ID) */
     public static final String ID = DocEnum.ID.getCode();
 
-    private static AtomicInteger atomicCount = new AtomicInteger();
+    @Autowired(required = false)
+    private AtomicInteger atomicUid;
     
-    private static AtomicInteger atomicUID = new AtomicInteger();
+    @Autowired(required = false)
+    private AtomicInteger atomicCount;
     
     /**
      * 全通路處理邏輯
@@ -470,8 +474,8 @@ public class JavaUtil {
      * @return UID AtomicLong
      * @throws NoSuchAlgorithmException
      */
-    public static Object getAtomicUID(int len) {
-		return String.format("%010d", atomicUID.incrementAndGet());
+    public Object getAtomicUID(int len) {
+		return String.format("%010d", atomicUid.incrementAndGet());
     }
     
     /**
@@ -493,7 +497,7 @@ public class JavaUtil {
      *
      * @return
      */
-    public static Object getUUID() throws NoSuchAlgorithmException {
+    public Object getUUID() throws NoSuchAlgorithmException {
         return getAtomicUID(10);
     }
 
@@ -527,4 +531,20 @@ public class JavaUtil {
         this.collection = collection;
     }
 
+	public AtomicInteger getAtomicUid() {
+		return atomicUid;
+	}
+
+	public void setAtomicUid(AtomicInteger atomicUid) {
+		this.atomicUid = atomicUid;
+	}
+
+	public AtomicInteger getAtomicCount() {
+		return atomicCount;
+	}
+
+	public void setAtomicCount(AtomicInteger atomicCount) {
+		this.atomicCount = atomicCount;
+	}
+	
 }

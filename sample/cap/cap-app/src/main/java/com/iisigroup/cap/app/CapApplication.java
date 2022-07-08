@@ -90,6 +90,9 @@ public class CapApplication implements CommandLineRunner {
         System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
 
         try {
+        	
+        	mongoCollection.deleteMany(Filters.or(Filters.eq("DeviceId", "D1"), Filters.eq("DeviceId", "D2"), Filters.eq("DeviceId", "D3"), Filters.eq("DeviceId", "D4"), Filters.eq("DeviceId", "D5"),
+                    Filters.eq("Id", "A456")));
 
             List<String> result = new ArrayList<String>();
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", null));
