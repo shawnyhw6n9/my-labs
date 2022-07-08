@@ -3,6 +3,8 @@
  */
 package com.iisigroup.cap.app.config;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -87,6 +89,11 @@ public class MongodbConfig {
 	public MongoDatabase mongoDatabase() {
 		MongoDatabase mongoDatabase = mongoClient().getDatabase(database);
 		return mongoDatabase;
+	}
+	
+	@Bean
+	public AtomicLong atomicLong(){
+		return new AtomicLong();
 	}
 	
 	public String getUri() {

@@ -69,6 +69,9 @@ public class JavaUtilTest {
         System.out.printf("================================== Start time => %s\n\n{$or : [\n\n", sDate);
 
         try {
+        	
+        	DeleteResult r = mongoCollection.deleteMany(Filters.or(Filters.eq("DeviceId", "D1"), Filters.eq("DeviceId", "D2"), Filters.eq("DeviceId", "D3"), Filters.eq("DeviceId", "D4"),
+                    Filters.eq("DeviceId", "D5"), Filters.eq("Id", "A456")));
 
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoDatabase, null, null));
             Assert.assertNull("queryByDeviceAndId", javaUtil.queryByDeviceAndId(mongoCollection, null, null));
@@ -87,8 +90,11 @@ public class JavaUtilTest {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A135"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
 
-            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("count= %d%s {UID: \"%s\"}",  index , (index == 0 ? " " : ", "), result.get(index))).collect(Collectors.toList());
+            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("%s {UID: \"%s\"} // count= %d", (index == 0 ? " " : ", "), result.get(index), index)).collect(Collectors.toList());
             collect.stream().forEach(System.out::println);
             
             mongoClient.close();

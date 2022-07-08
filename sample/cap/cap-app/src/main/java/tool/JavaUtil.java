@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,6 +185,10 @@ public class JavaUtil {
     /** 客戶 ID (ID) */
     public static final String ID = DocEnum.ID.getCode();
 
+    private static AtomicInteger atomicCount = new AtomicInteger();
+    
+    private static AtomicInteger atomicUID = new AtomicInteger();
+    
     /**
      * 全通路處理邏輯
      * 
@@ -347,6 +352,10 @@ public class JavaUtil {
             // toApplyDocument = null;
             // resultList = null;
 
+            // FIXME
+            toApplyDocument.remove(OBJECT_ID);
+            System.out.printf("//%02d: %s\n", atomicCount.incrementAndGet(), toApplyDocument);
+             
             // 並回傳 UID
             return trim(u);
         }
@@ -455,6 +464,17 @@ public class JavaUtil {
     }
 
     /**
+     * atomicUID.get()
+     * 
+     * @param len int
+     * @return UID AtomicLong
+     * @throws NoSuchAlgorithmException
+     */
+    public static Object getAtomicUID(int len) {
+		return String.format("%010d", atomicUID.incrementAndGet());
+    }
+    
+    /**
      * Get reandom UUID.
      *
      * @param len
@@ -474,7 +494,7 @@ public class JavaUtil {
      * @return
      */
     public static Object getUUID() throws NoSuchAlgorithmException {
-        return getJavaUUID(20);
+        return getAtomicUID(10);
     }
 
     /**

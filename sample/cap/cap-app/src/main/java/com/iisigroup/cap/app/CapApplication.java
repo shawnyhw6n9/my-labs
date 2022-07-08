@@ -105,10 +105,13 @@ public class CapApplication implements CommandLineRunner {
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A135"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
             result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A444"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D5", "A222"));
+            result.add(javaUtil.queryByDeviceAndId(mongoCollection, "D1", "A123"));
 
             mongoClient.close();
 
-            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("count= %d%s {UID: \"%s\"}", index, (index == 0 ? " " : ", "), result.get(index)))
+            List<String> collect = IntStream.range(0, result.size()).mapToObj(index -> String.format("%s {UID: \"%s\"} // count= %d", (index == 0 ? " " : ", "), result.get(index), index))
                     .collect(Collectors.toList());
 
             collect.stream().forEach(System.out::println);
